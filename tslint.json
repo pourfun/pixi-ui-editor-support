@@ -1,0 +1,259 @@
+{
+	"rules": {
+		/********* TypeScript Specific ********/
+		/* These rules find errors related to TypeScript features */
+		// 必须显式声明成员可见性
+		"member-access": true,
+		// 禁止 any
+		// "no-any": true,
+		// 禁止内部 module
+		"no-internal-module": true,
+		// 禁止 namespace
+		// "no-namespace": true,
+		// 禁止 <reference>
+		// "no-reference": true,
+		// 禁止 magic number
+		// "no-magic-numbers": true,
+		// 禁止 var xxx = requires(xxx)
+		"no-var-requires": true,
+		// 推荐使用 for-of
+		// "prefer-for-of": true,
+		/********** Functionality **********/
+		/* These rules catch common errors in JS programming or otherwise confusing constructs that are prone to producing bugs */
+		// [warn] Warns for an awaited value that is not a Promise.
+		"await-promise": true,
+		// if/for 等后必须加代码块
+		"curly": true,
+		// 使用 for-in 时必须检查 key 的持有
+		"forin": true,
+		// 禁用 arguments.callee
+		"no-arg": true,
+		// 禁止条件表达式中出现赋值操作符
+		"no-conditional-assignment": true,
+		// 禁止对 Number, String 等使用new
+		"no-construct": true,
+		// [warn] 禁止多次调用 super()
+		"no-duplicate-super": true,
+		// 禁止重复声明变量
+		"no-duplicate-variable": true,
+		// 禁止 eval
+		"no-eval": true,
+		// promise 必须最终被处理（then、catch）
+		"no-floating-promises": true,
+		// 禁止对 array 使用 for-in
+		"no-for-in-array": true,
+		// 禁止在 class 外部使用 this
+		"no-invalid-this": true,
+		// 禁止通过字符串访问对象属性
+		// "no-string-literal": true,
+		// 禁止 throw 字符串
+		"no-string-throw": true,
+		// [warn] Warns when a method is used as outside of a method call.
+		"no-unbound-method": true,
+		// [warn] Warns when using an expression of type ‘any’ in an unsafe way. Type casts and tests are allowed. Expressions that work on all values (such as ‘”” + x’) are allowed.
+		"no-unsafe-any": true,
+		// 禁止在 finally 中使用控制代码，如 return, continue, break and throws
+		"no-unsafe-finally": true,
+		// 禁止未使用的表达式
+		"no-unused-expression": true,
+		// 禁止未使用的 new
+		"no-unused-new": true,
+		// 禁止未使用的变量
+		"no-unused-variable": true,
+		// 禁止在声明前使用变量
+		"no-use-before-declare": true,
+		// 禁止 var
+		"no-var-keyword": true,
+		// Requires expressions of type void to appear in statement position.
+		"no-void-expression": true,
+		// parseInt 必须传入进制
+		"radix": true,
+		// 数字和字符串相加时，两者必须类型相同
+		"restrict-plus-operands": true,
+		// 严格限制 boolean 类型
+		"strict-boolean-expressions": true,
+		// [warn] Warns for type predicates that are always true or always false. Works for ‘typeof’ comparisons to constants (e.g. ‘typeof foo === “string”’), and equality comparison to ‘null’/’undefined’. (TypeScript won’t let you compare ‘1 === 2’, but it has an exception for ‘1 === undefined’.) Does not yet work for ‘instanceof’. Does not warn for ‘if (x.y)’ where ‘x.y’ is always truthy. For that, see strict-boolean-expressions.
+		"strict-type-predicates": true,
+		// switch 必须有 default
+		"switch-default": false,
+		// 必须使用 ===，除了对于判断 null 和 undefined
+		"triple-equals": [
+			true,
+			"allow-null-check",
+			"allow-undefined-check"
+		],
+		// Makes sure result of typeof is compared to correct string values
+		"typeof-compare": true,
+		// 禁止使用 ==NaN
+		"use-isnan": true,
+		/********** Maintainability **********/
+		/* These rules make code maintenance easier */
+		// 限制 if 等分支控制代码的圈复杂度
+		"cyclomatic-complexity": [
+			true,
+			100
+		],
+		// 末尾空行
+		"eofline": true,
+		// 缩进
+		"indent": [
+			true,
+			"spaces"
+		],
+		// 换行符
+		// "linebreak-style": [
+		// 	true,
+		// 	"LF"
+		// ],
+		// 限制一个文件中能出现的 class 数量
+		"max-classes-per-file": [
+			true,
+			5
+		],
+		// 限制一个文件的行数
+		"max-file-line-count": [
+			true,
+			1000
+		],
+		// 限制一行代码的长度
+		"max-line-length": [
+			true,
+			1000
+		],
+		// 禁止 default 导出
+		"no-default-export": true,
+		// 禁止使用 require 导入
+		"no-require-imports": false,
+		// 末尾逗号限制：多行必须加，单行不可加
+		"trailing-comma": [
+			true,
+			{
+				"multiline": "always",
+				"singleline": "never"
+			}
+		],
+		/*********** Style ***********/
+		/* These rules enforce consistent style across your codebase */
+		// array 类型使用 Array<T> 的写法
+		// "array-type": [
+		// 	true,
+		// 	"generic"
+		// ],
+		// Suggests to convert () => { return x; } to () => x.
+		"arrow-return-shorthand": [
+			true,
+			"multiline"
+		],
+		// 类和接口使用 PascalCased 方式命名
+		"class-name": true,
+		// 单行注释必须以空格开始
+		"comment-format": [
+			true,
+			"check-space"
+		],
+		// 强制文档注释
+		"completed-docs": [
+			true,
+			"classes",
+			"enums",
+			"functions",
+			"methods",
+			"types"
+		],
+		// 文件头部必须有声明
+		// "file-header": [true, "Copyright \\d{4}"]
+		// Ensures proper spacing between import statement keywords
+		"import-spacing": true,
+		// 接口命名前面不要加 I
+		"interface-name": [
+			true,
+			"never-prefix"
+		],
+		// Prefer an interface declaration over a type literal (type T = { ... })
+		"interface-over-type-literal": true,
+		// return 前必须空一行，除非只有这一句s
+		"newline-before-return": true,
+		// new 必须加括号
+		"new-parens": true,
+		// 类型转换要使用 xx as T，而非 <T>xx
+		"no-angle-bracket-type-assertion": true,
+		// [warn] 不要与 boolean 做比较（xx === true）
+		"no-boolean-literal-compare": true,
+		// 禁止连续空行（最多允许连续 4 个）
+		"no-consecutive-blank-lines": [
+			true,
+			4
+		],
+		// 禁止行末空格
+		"no-trailing-whitespace": [
+			true,
+			"ignore-comments"
+		],
+		// Warns when a namespace qualifier (A.x) is unnecessary.
+		"no-unnecessary-qualifier": true,
+		// object 字面量的 key 不要加引号，除非含有特殊字符
+		"object-literal-key-quotes": [
+			true,
+			"as-needed"
+		],
+		// catch 等应与前一个右括号在同一行，且应有空格隔开
+		"one-line": [
+			true,
+			"check-catch",
+			"check-finally",
+			"check-else",
+			"check-open-brace",
+			"check-whitespace"
+		],
+		// 禁止一行内声明多个变量，除了 for 循环头部
+		"one-variable-per-declaration": [
+			true,
+			"ignore-for-loop"
+		],
+		// import 必须按字母顺序排列
+		"ordered-imports": [
+			true
+		],
+		// [warn] 没有使用到 this 的成员方法，应考虑改写为公共函数（只检查 private 方法）
+		"prefer-function-over-method": [
+			true,
+			"allow-public",
+			"allow-protected"
+		],
+		// 接口中定义方法应使用 foo(): void 形式，而非 foo: () => void 形式
+		"prefer-method-signature": true,
+		// 使用单引号，其内部允许使用双引号，对于jsx使用双引号
+		"quotemark": [
+			true,
+			"single",
+			"avoid-escape",
+			"jsx-double"
+		],
+		// 必须加分号
+		"semicolon": [
+			true,
+			"always"
+		],
+		// 函数中，括号前需要加空格：匿名函数、异步箭头函数必须加，命名函数不可添加
+		"space-before-function-paren": [
+			true,
+			{
+				"anonymous": "always",
+				"named": "never",
+				"asyncArrow": "always"
+			}
+		],
+		// if 等后面，运算符两侧，逗号后面等地方，必须加空格
+		"whitespace": [
+			true,
+			"check-branch",
+			"check-decl",
+			"check-operator",
+			"check-module",
+			"check-separator",
+			"check-type",
+			"check-typecast",
+			"check-preblock"
+		]
+	}
+}
