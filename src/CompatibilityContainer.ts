@@ -24,19 +24,31 @@ namespace eui {
         }
 
 
+        private _scaleX: number = 1;
         public set scaleX(value: number) {
-            this.scale.x = value;
+            if (value == null) {
+                return;
+            }
+            let trueWidth: number = this.width / this._scaleX;
+            this._scaleX = value;
+            this.width = this._scaleX * trueWidth;
         }
         public get scaleX(): number {
-            return this.scale.x;
+            return this._scaleX;
         }
 
 
+        private _scaleY: number = 1;
         public set scaleY(value: number) {
-            this.scale.y = value;
+            if (value == null) {
+                return;
+            }
+            let trueHeight: number = this.height / this._scaleY;
+            this._scaleY = value;
+            this.height = this._scaleY * trueHeight;
         }
         public get scaleY(): number {
-            return this.scale.y;
+            return this._scaleY;
         }
 
 
@@ -57,6 +69,7 @@ namespace eui {
 
 
         public id: string;
+
 
         public includeInLayout: boolean;
 
@@ -128,6 +141,13 @@ namespace eui {
         }
         public get currentState(): string {
             return this._currentState;
+        }
+
+
+        protected _destroyed: boolean;
+        public get destroyed(): boolean
+        {
+            return this._destroyed;
         }
     }
 
