@@ -62,13 +62,9 @@ namespace eui {
             }
         }
 
-        protected sign(n): number {
-            return n ? (n < 0 ? -1 : 1) : 0;
-        }
-
 
         private _range: PIXI.Rectangle = new PIXI.Rectangle();
-        private _scale9Grid: string;
+        protected _scale9Grid: string;
         public set scale9Grid(value: string) {
             if (value != null && value === this._scale9Grid) {
                 return;
@@ -90,13 +86,13 @@ namespace eui {
         }
 
 
-        private _texture: PIXI.Texture;
+        protected _texture: PIXI.Texture;
         public get texture(): PIXI.Texture {
             return this._texture;
         }
 
 
-        private _source: string | PIXI.Texture;
+        protected _source: string | PIXI.Texture;
         public set source(value: string | PIXI.Texture) {
             if (value == null) {
                 this._texture = PIXI.Texture.EMPTY;
@@ -258,7 +254,7 @@ namespace eui {
         // override super
         public destroy(options?: PIXI.IDestroyOptions | boolean): void {
             this.clearSprites();
-            this._hasDestroyed = true;
+            this._destroyed = true;
             super.destroy(options);
         }
     }

@@ -16,6 +16,24 @@ var eui;
             var _this = _super.call(this) || this;
             _this._scaleX = 1;
             _this._scaleY = 1;
+            _this.vars = {
+                left: null,
+                right: null,
+                top: null,
+                bottom: null,
+                horizontalCenter: null,
+                verticalCenter: null,
+                percentWidth: NaN,
+                percentHeight: NaN,
+                explicitWidth: NaN,
+                explicitHeight: NaN,
+                width: 0,
+                height: 0,
+                oldX: 0,
+                oldY: 0,
+                oldWidth: 0,
+                oldHeight: 0,
+            };
             return _this;
         }
         Object.defineProperty(CompatibilityContainer.prototype, "skewX", {
@@ -23,7 +41,7 @@ var eui;
                 return this.skew.x;
             },
             set: function (value) {
-                this.skew.x = value;
+                this.skew.x = +value;
             },
             enumerable: true,
             configurable: true
@@ -33,7 +51,7 @@ var eui;
                 return this.skew.y;
             },
             set: function (value) {
-                this.skew.y = value;
+                this.skew.y = +value;
             },
             enumerable: true,
             configurable: true
@@ -47,7 +65,7 @@ var eui;
                     return;
                 }
                 var trueWidth = this.width / this._scaleX;
-                this._scaleX = value;
+                this._scaleX = +value;
                 this.width = this._scaleX * trueWidth;
             },
             enumerable: true,
@@ -62,7 +80,7 @@ var eui;
                     return;
                 }
                 var trueHeight = this.height / this._scaleY;
-                this._scaleY = value;
+                this._scaleY = +value;
                 this.height = this._scaleY * trueHeight;
             },
             enumerable: true,
@@ -73,7 +91,7 @@ var eui;
                 return this.pivot.x;
             },
             set: function (value) {
-                this.pivot.x = value;
+                this.pivot.x = +value;
             },
             enumerable: true,
             configurable: true
@@ -83,7 +101,67 @@ var eui;
                 return this.pivot.y;
             },
             set: function (value) {
-                this.pivot.y = value;
+                this.pivot.y = +value;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CompatibilityContainer.prototype, "left", {
+            get: function () {
+                return this.vars.left;
+            },
+            set: function (value) {
+                this.vars.left = value.toString();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CompatibilityContainer.prototype, "right", {
+            get: function () {
+                return this.vars.right;
+            },
+            set: function (value) {
+                this.vars.right = value.toString();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CompatibilityContainer.prototype, "top", {
+            get: function () {
+                return this.vars.top;
+            },
+            set: function (value) {
+                this.vars.top = value.toString();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CompatibilityContainer.prototype, "bottom", {
+            get: function () {
+                return this.vars.bottom;
+            },
+            set: function (value) {
+                this.vars.bottom = value.toString();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CompatibilityContainer.prototype, "horizontalCenter", {
+            get: function () {
+                return this.vars.horizontalCenter;
+            },
+            set: function (value) {
+                this.vars.horizontalCenter = value.toString();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CompatibilityContainer.prototype, "verticalCenter", {
+            get: function () {
+                return this.vars.verticalCenter;
+            },
+            set: function (value) {
+                this.vars.verticalCenter = value.toString();
             },
             enumerable: true,
             configurable: true
@@ -284,9 +362,6 @@ var eui;
             enumerable: true,
             configurable: true
         });
-        Image.prototype.sign = function (n) {
-            return n ? (n < 0 ? -1 : 1) : 0;
-        };
         Object.defineProperty(Image.prototype, "scale9Grid", {
             get: function () {
                 return this._scale9Grid;
@@ -476,7 +551,7 @@ var eui;
         };
         Image.prototype.destroy = function (options) {
             this.clearSprites();
-            this._hasDestroyed = true;
+            this._destroyed = true;
             _super.prototype.destroy.call(this, options);
         };
         return Image;

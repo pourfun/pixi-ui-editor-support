@@ -9,13 +9,6 @@ namespace eui {
      */
     export interface UIComponent extends PIXI.DisplayObject {
 
-        /**
-         * 指定此组件是否包含在父容器的布局中。若为false，则父级容器在测量和布局阶段都忽略此组件。
-         * 
-         * @type {boolean}
-         * @memberof UIComponent
-         */
-        includeInLayout: boolean;
 
         /**
          * 距父级容器离左边距离。
@@ -96,38 +89,6 @@ namespace eui {
          * @memberof UIComponent
          */
         explicitHeight: number;
-
-        /**
-         * 组件的最小宽度,此属性设置为大于maxWidth的值时无效。同时影响测量和自动布局的尺寸。
-         * 
-         * @type {number}
-         * @memberof UIComponent
-         */
-        minWidth: number;
-
-        /**
-         * 组件的最大高度。同时影响测量和自动布局的尺寸。
-         * 
-         * @type {number}
-         * @memberof UIComponent
-         */
-        maxWidth: number;
-
-        /**
-         * 组件的最小高度,此属性设置为大于maxHeight的值时无效。同时影响测量和自动布局的尺寸。
-         * 
-         * @type {number}
-         * @memberof UIComponent
-         */
-        minHeight: number;
-
-        /**
-         * 组件的最大高度,同时影响测量和自动布局的尺寸。
-         * 
-         * @type {number}
-         * @memberof UIComponent
-         */
-        maxHeight: number;
     }
 
 }
