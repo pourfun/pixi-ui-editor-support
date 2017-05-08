@@ -1,5 +1,6 @@
 /// <reference path='../libs/pixi.js.d.ts'/>
 
+/// <reference path='./Constant.ts'/>
 /// <reference path='./types/UIComponent.ts'/>
 
 /// <reference path='./CompatibilityContainer.ts'/>

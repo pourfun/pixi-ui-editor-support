@@ -1,54 +1,62 @@
 namespace eui {
 
+    export interface GroupVariables extends UIComponentVariables {
+        contentWidth?: number;
+        contentHeight?: number;
+        scrollH?: number;
+        scrollV?: number;
+        scrollEnabled?: boolean;
+    }
+
     export class Group extends CompatibilityContainer {
 
         constructor() {
             super();
+
+            this._type = TYPE_GROUP;
         }
 
 
-        private _contentWidth: number;
+        public vars: GroupVariables = {};
+
+
         public set contentWidth(value: number) {
-            this._contentWidth = value;
+            this.vars.contentWidth = +value;
         }
         public get contentWidth(): number {
-            return this._contentWidth;
+            return this.vars.contentWidth;
         }
 
 
-        private _contentHeight: number;
         public set contentHeight(value: number) {
-            this._contentHeight = value;
+            this.vars.contentHeight = +value;
         }
         public get contentHeight(): number {
-            return this._contentHeight;
+            return this.vars.contentHeight;
         }
 
 
-        private _scrollH: number;
         public set scrollH(value: number) {
-            this._scrollH = value;
+            this.vars.scrollH = +value;
         }
         public get scrollH(): number {
-            return this._scrollH;
+            return this.vars.scrollH;
         }
 
 
-        private _scrollV: number;
         public set scrollV(value: number) {
-            this._scrollV = value;
+            this.vars.scrollV = +value;
         }
         public get scrollV(): number {
-            return this._scrollV;
+            return this.vars.scrollV;
         }
 
 
-        private _scrollEnabled: boolean;
         public set scrollEnabled(value: boolean) {
-            this._scrollEnabled = value;
+            this.vars.scrollEnabled = !!value;
         }
         public get scrollEnabled(): boolean {
-            return this._scrollEnabled;
+            return this.vars.scrollEnabled;
         }
     }
 

@@ -204,7 +204,7 @@ namespace eui {
                 new PIXI.Rectangle(right, top, this._texture.width - right, height),
                 new PIXI.Rectangle(0, bottom, left, this._texture.height - bottom),
                 new PIXI.Rectangle(left, bottom, width, this._texture.height - bottom),
-                new PIXI.Rectangle(right, bottom, this._texture.width - right, this._texture.height - bottom)
+                new PIXI.Rectangle(right, bottom, this._texture.width - right, this._texture.height - bottom),
             ];
 
             this.clearSprites();

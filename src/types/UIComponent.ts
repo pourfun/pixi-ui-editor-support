@@ -57,38 +57,6 @@ namespace eui {
          * @memberof UIComponent
          */
         verticalCenter: any;
-
-        /**
-         * 相对父级容器宽度的百分比。
-         * 
-         * @type {number}
-         * @memberof UIComponent
-         */
-        percentWidth: number;
-
-        /**
-         * 相对父级容器高度的百分比。
-         * 
-         * @type {number}
-         * @memberof UIComponent
-         */
-        percentHeight: number;
-
-        /**
-         * 外部显式指定的宽度。
-         * 
-         * @type {number}
-         * @memberof UIComponent
-         */
-        explicitWidth: number;
-
-        /**
-         * 外部显式指定的高度。
-         * 
-         * @type {number}
-         * @memberof UIComponent
-         */
-        explicitHeight: number;
     }
 
 }

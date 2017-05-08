@@ -33,13 +33,13 @@ PIXI.loader.add(['../assets/1.png', '../assets/2.png']);
 PIXI.loader.load((loader: PIXI.loaders.Loader, res: {[key: string]: PIXI.loaders.Resource}) => {
     let t1: PIXI.Texture = PIXI.utils.TextureCache['../assets/1.png'];
     let t2: PIXI.Texture = PIXI.utils.TextureCache['../assets/2.png'];
-    let img: eui.Image = new eui.Image();
-    img.source = t1;
-    stage.addChild(img);
-    img.scale9Grid = '10,10,20,20';
-    img.width = 500;
-    img.height = 500;
-    img.source = null;
-    img.source = t2;
+    for (let i: number = 0; i < 1; i ++) {
+        let img: eui.Image = new eui.Image();
+        img.source = t2;
+        stage.addChild(img);
+        img.scale9Grid = '100,30,10,10';
+        img.width = 500;
+        img.height = 500;
+    }
 });
 

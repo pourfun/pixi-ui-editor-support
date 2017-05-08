@@ -1,56 +1,33 @@
 namespace eui {
 
     export interface UIComponentVariables {
-        left: string;
-        right: string;
-        top: string;
-        bottom: string;
-        horizontalCenter: string;
-        verticalCenter: string;
-        percentWidth: number;
-        percentHeight: number;
-        explicitWidth: number;
-        explicitHeight: number;
-        width: number;
-        height: number;
-        oldX: number;
-        oldY: number;
-        oldWidth: number;
-        oldHeight: number;
+        left?: string;
+        right?: string;
+        top?: string;
+        bottom?: string;
+        horizontalCenter?: string;
+        verticalCenter?: string;
     }
 
     export class CompatibilityContainer extends PIXI.Container implements UIComponent {
 
         constructor() {
             super();
-
-            this.vars = {
-                left: null,
-                right: null,
-                top: null,
-                bottom: null,
-                horizontalCenter: null,
-                verticalCenter: null,
-                percentWidth: NaN,
-                percentHeight: NaN,
-                explicitWidth: NaN,
-                explicitHeight: NaN,
-                width: 0,
-                height: 0,
-                oldX: 0,
-                oldY: 0,
-                oldWidth: 0,
-                oldHeight: 0,
-            };
         }
 
-        public vars: UIComponentVariables;
+        public vars: UIComponentVariables = {};
 
 
         public id: string;
 
 
         public userData: any;
+
+
+        protected _type: string;
+        public get type(): string {
+            return this._type;
+        }
 
 
         public set skewX(value: number) {
@@ -69,33 +46,19 @@ namespace eui {
         }
 
 
-        // TODO
-        private _scaleX: number = 1;
         public set scaleX(value: number) {
-            if (value == null) {
-                return;
-            }
-            let trueWidth: number = this.width / this._scaleX;
-            this._scaleX = +value;
-            this.width = this._scaleX * trueWidth;
+            this.scale.x = +value;
         }
         public get scaleX(): number {
-            return this._scaleX;
+            return this.scale.x;
         }
 
 
-        // TODO
-        private _scaleY: number = 1;
         public set scaleY(value: number) {
-            if (value == null) {
-                return;
-            }
-            let trueHeight: number = this.height / this._scaleY;
-            this._scaleY = +value;
-            this.height = this._scaleY * trueHeight;
+            this.scale.y = +value;
         }
         public get scaleY(): number {
-            return this._scaleY;
+            return this.scale.y;
         }
 
 
@@ -161,18 +124,6 @@ namespace eui {
         public get verticalCenter(): string {
             return this.vars.verticalCenter;
         }
-
-
-        public percentWidth: number;
-
-
-        public percentHeight: number;
-
-
-        public explicitWidth: number;
-
-
-        public explicitHeight: number;
 
 
         protected _states: {[key: string]: {[key: string]: string | number}}[];

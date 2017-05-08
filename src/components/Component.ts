@@ -1,26 +1,35 @@
 namespace eui {
 
+    export interface ComponentVariables extends UIComponentVariables {
+        skinName?: string;
+        enable?: boolean;
+    }
+
+
     export class Component extends CompatibilityContainer {
 
         constructor() {
             super();
+            this._type = TYPE_COMPONENT;
         }
 
+
+        public vars: ComponentVariables = {};
 
 
         public set enable(value: boolean) {
-
+            this.vars.enable = !!value;
         }
         public get enable(): boolean {
-            return null;
+            return this.vars.enable;
         }
 
 
-        public set skin(value: any) {
-
+        public set skinName(value: string) {
+            this.vars.skinName = value;
         }
-        public get skin(): any {
-            return null;
+        public get skinName(): string {
+            return this.vars.skinName;
         }
     }
 

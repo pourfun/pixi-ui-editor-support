@@ -10,32 +10,25 @@ var __extends = (this && this.__extends) || (function () {
 })();
 var eui;
 (function (eui) {
+    eui.TYPE_COMPONENT = 'Component';
+    eui.TYPE_GROUP = 'Group';
+})(eui || (eui = {}));
+var eui;
+(function (eui) {
     var CompatibilityContainer = (function (_super) {
         __extends(CompatibilityContainer, _super);
         function CompatibilityContainer() {
             var _this = _super.call(this) || this;
-            _this._scaleX = 1;
-            _this._scaleY = 1;
-            _this.vars = {
-                left: null,
-                right: null,
-                top: null,
-                bottom: null,
-                horizontalCenter: null,
-                verticalCenter: null,
-                percentWidth: NaN,
-                percentHeight: NaN,
-                explicitWidth: NaN,
-                explicitHeight: NaN,
-                width: 0,
-                height: 0,
-                oldX: 0,
-                oldY: 0,
-                oldWidth: 0,
-                oldHeight: 0,
-            };
+            _this.vars = {};
             return _this;
         }
+        Object.defineProperty(CompatibilityContainer.prototype, "type", {
+            get: function () {
+                return this._type;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(CompatibilityContainer.prototype, "skewX", {
             get: function () {
                 return this.skew.x;
@@ -58,30 +51,20 @@ var eui;
         });
         Object.defineProperty(CompatibilityContainer.prototype, "scaleX", {
             get: function () {
-                return this._scaleX;
+                return this.scale.x;
             },
             set: function (value) {
-                if (value == null) {
-                    return;
-                }
-                var trueWidth = this.width / this._scaleX;
-                this._scaleX = +value;
-                this.width = this._scaleX * trueWidth;
+                this.scale.x = +value;
             },
             enumerable: true,
             configurable: true
         });
         Object.defineProperty(CompatibilityContainer.prototype, "scaleY", {
             get: function () {
-                return this._scaleY;
+                return this.scale.y;
             },
             set: function (value) {
-                if (value == null) {
-                    return;
-                }
-                var trueHeight = this.height / this._scaleY;
-                this._scaleY = +value;
-                this.height = this._scaleY * trueHeight;
+                this.scale.y = +value;
             },
             enumerable: true,
             configurable: true
@@ -212,22 +195,27 @@ var eui;
     var Component = (function (_super) {
         __extends(Component, _super);
         function Component() {
-            return _super.call(this) || this;
+            var _this = _super.call(this) || this;
+            _this.vars = {};
+            _this._type = eui.TYPE_COMPONENT;
+            return _this;
         }
         Object.defineProperty(Component.prototype, "enable", {
             get: function () {
-                return null;
+                return this.vars.enable;
             },
             set: function (value) {
+                this.vars.enable = !!value;
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Component.prototype, "skin", {
+        Object.defineProperty(Component.prototype, "skinName", {
             get: function () {
-                return null;
+                return this.vars.skinName;
             },
             set: function (value) {
+                this.vars.skinName = value;
             },
             enumerable: true,
             configurable: true
@@ -241,54 +229,57 @@ var eui;
     var Group = (function (_super) {
         __extends(Group, _super);
         function Group() {
-            return _super.call(this) || this;
+            var _this = _super.call(this) || this;
+            _this.vars = {};
+            _this._type = eui.TYPE_GROUP;
+            return _this;
         }
         Object.defineProperty(Group.prototype, "contentWidth", {
             get: function () {
-                return this._contentWidth;
+                return this.vars.contentWidth;
             },
             set: function (value) {
-                this._contentWidth = value;
+                this.vars.contentWidth = +value;
             },
             enumerable: true,
             configurable: true
         });
         Object.defineProperty(Group.prototype, "contentHeight", {
             get: function () {
-                return this._contentHeight;
+                return this.vars.contentHeight;
             },
             set: function (value) {
-                this._contentHeight = value;
+                this.vars.contentHeight = +value;
             },
             enumerable: true,
             configurable: true
         });
         Object.defineProperty(Group.prototype, "scrollH", {
             get: function () {
-                return this._scrollH;
+                return this.vars.scrollH;
             },
             set: function (value) {
-                this._scrollH = value;
+                this.vars.scrollH = +value;
             },
             enumerable: true,
             configurable: true
         });
         Object.defineProperty(Group.prototype, "scrollV", {
             get: function () {
-                return this._scrollV;
+                return this.vars.scrollV;
             },
             set: function (value) {
-                this._scrollV = value;
+                this.vars.scrollV = +value;
             },
             enumerable: true,
             configurable: true
         });
         Object.defineProperty(Group.prototype, "scrollEnabled", {
             get: function () {
-                return this._scrollEnabled;
+                return this.vars.scrollEnabled;
             },
             set: function (value) {
-                this._scrollEnabled = value;
+                this.vars.scrollEnabled = !!value;
             },
             enumerable: true,
             configurable: true
@@ -504,7 +495,7 @@ var eui;
                 new PIXI.Rectangle(right, top, this._texture.width - right, height),
                 new PIXI.Rectangle(0, bottom, left, this._texture.height - bottom),
                 new PIXI.Rectangle(left, bottom, width, this._texture.height - bottom),
-                new PIXI.Rectangle(right, bottom, this._texture.width - right, this._texture.height - bottom)
+                new PIXI.Rectangle(right, bottom, this._texture.width - right, this._texture.height - bottom),
             ];
             this.clearSprites();
             for (var i = 0, len = ranges.length; i < len; i++) {
@@ -580,13 +571,13 @@ PIXI.loader.add(['../assets/1.png', '../assets/2.png']);
 PIXI.loader.load(function (loader, res) {
     var t1 = PIXI.utils.TextureCache['../assets/1.png'];
     var t2 = PIXI.utils.TextureCache['../assets/2.png'];
-    var img = new eui.Image();
-    img.source = t1;
-    stage.addChild(img);
-    img.scale9Grid = '10,10,20,20';
-    img.width = 500;
-    img.height = 500;
-    img.source = null;
-    img.source = t2;
+    for (var i = 0; i < 1; i++) {
+        var img = new eui.Image();
+        img.source = t2;
+        stage.addChild(img);
+        img.scale9Grid = '100,30,10,10';
+        img.width = 500;
+        img.height = 500;
+    }
 });
 //# sourceMappingURL=test.js.map
