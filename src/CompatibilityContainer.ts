@@ -7,12 +7,24 @@ namespace eui {
         bottom?: string;
         horizontalCenter?: string;
         verticalCenter?: string;
+
+        includeInLayout?: boolean;
+        states?: string[];
+
+        currentState?: string;
+
+        stateConfigDict?: any;
     }
 
     export class CompatibilityContainer extends PIXI.Container implements UIComponent {
 
         constructor() {
             super();
+
+            this.on(EVENT_ADDED, this.onAdded, this);
+            this.on(EVENT_REMOVED, this.onRemoved, this);
+
+            this.vars.stateConfigDict = {};
         }
 
         public vars: UIComponentVariables = {};
@@ -28,6 +40,9 @@ namespace eui {
         public get type(): string {
             return this._type;
         }
+
+
+        public hostComponentKey: string;
 
 
         public set skewX(value: number) {
@@ -78,6 +93,14 @@ namespace eui {
         }
 
 
+        public set includeInLayout(value: boolean) {
+            this.vars.includeInLayout = !!value;
+        }
+        public get includeInLayout(): boolean {
+            return this.vars.includeInLayout;
+        }
+
+
         public set left(value: string) {
             this.vars.left = value.toString();
         }
@@ -125,32 +148,58 @@ namespace eui {
             return this.vars.verticalCenter;
         }
 
-
-        protected _states: {[key: string]: {[key: string]: string | number}}[];
-        public set states(value: {[key: string]: {[key: string]: string | number}}[]) {
+        // 组件自身具有的状态
+        public set states(value: string[]) {
             if (value == null) {
                 return;
             }
-            if (value.length === 0) {
-                return;
+            this.vars.states = value;
+        }
+        public get states(): string[] {
+            return this.vars.states;
+        }
+        public hasState(value: string): boolean {
+            if (this.vars.states == null) {
+                return false;
             }
-            this._states = value;
-        }
-        public get states(): {[key: string]: {[key: string]: string | number}}[] {
-            return this._states;
-        }
+            let states: string[] = this.vars.states;
+            for (let i: number = 0; i < states.length; i ++) {
+                if (states[i] === value) {
+                    return true;
+                }
+            }
 
-        protected _currentState: string;
+            return false;
+        }
         public set currentState(value: string) {
-            let newState: string = this._states[value];
-            if (newState == null || newState === this._currentState) {
+            let newState: string = this.vars.states[value];
+            if (newState == null || newState === this.vars.currentState) {
                 return;
             }
-            this._currentState = value;
-            // TODO
+            this.vars.currentState = value;
+            // TODO 更新子对象显示状态
         }
         public get currentState(): string {
-            return this._currentState;
+            return this.vars.currentState;
+        }
+
+
+
+
+        public addStateConfig(state: string, config: any): void {
+            this.vars.stateConfigDict[state] = config;
+        }
+
+
+
+
+        protected onAdded(parent: PIXI.Container): void {
+
+        }
+
+
+        protected onRemoved(parent: PIXI.Container): void {
+
         }
 
 

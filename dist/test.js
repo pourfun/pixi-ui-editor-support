@@ -15,11 +15,19 @@ var eui;
 })(eui || (eui = {}));
 var eui;
 (function (eui) {
+    eui.EVENT_ADDED = 'added';
+    eui.EVENT_REMOVED = 'removed';
+})(eui || (eui = {}));
+var eui;
+(function (eui) {
     var CompatibilityContainer = (function (_super) {
         __extends(CompatibilityContainer, _super);
         function CompatibilityContainer() {
             var _this = _super.call(this) || this;
             _this.vars = {};
+            _this.on(eui.EVENT_ADDED, _this.onAdded, _this);
+            _this.on(eui.EVENT_REMOVED, _this.onRemoved, _this);
+            _this.vars.stateConfigDict = {};
             return _this;
         }
         Object.defineProperty(CompatibilityContainer.prototype, "type", {
@@ -89,6 +97,16 @@ var eui;
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(CompatibilityContainer.prototype, "includeInLayout", {
+            get: function () {
+                return this.vars.includeInLayout;
+            },
+            set: function (value) {
+                this.vars.includeInLayout = !!value;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(CompatibilityContainer.prototype, "left", {
             get: function () {
                 return this.vars.left;
@@ -151,34 +169,50 @@ var eui;
         });
         Object.defineProperty(CompatibilityContainer.prototype, "states", {
             get: function () {
-                return this._states;
+                return this.vars.states;
             },
             set: function (value) {
                 if (value == null) {
                     return;
                 }
-                if (value.length === 0) {
-                    return;
-                }
-                this._states = value;
+                this.vars.states = value;
             },
             enumerable: true,
             configurable: true
         });
+        CompatibilityContainer.prototype.hasState = function (value) {
+            if (this.vars.states == null) {
+                return false;
+            }
+            var states = this.vars.states;
+            for (var i = 0; i < states.length; i++) {
+                if (states[i] === value) {
+                    return true;
+                }
+            }
+            return false;
+        };
         Object.defineProperty(CompatibilityContainer.prototype, "currentState", {
             get: function () {
-                return this._currentState;
+                return this.vars.currentState;
             },
             set: function (value) {
-                var newState = this._states[value];
-                if (newState == null || newState === this._currentState) {
+                var newState = this.vars.states[value];
+                if (newState == null || newState === this.vars.currentState) {
                     return;
                 }
-                this._currentState = value;
+                this.vars.currentState = value;
             },
             enumerable: true,
             configurable: true
         });
+        CompatibilityContainer.prototype.addStateConfig = function (state, config) {
+            this.vars.stateConfigDict[state] = config;
+        };
+        CompatibilityContainer.prototype.onAdded = function (parent) {
+        };
+        CompatibilityContainer.prototype.onRemoved = function (parent) {
+        };
         Object.defineProperty(CompatibilityContainer.prototype, "destroyed", {
             get: function () {
                 return this._destroyed;
@@ -189,6 +223,17 @@ var eui;
         return CompatibilityContainer;
     }(PIXI.Container));
     eui.CompatibilityContainer = CompatibilityContainer;
+})(eui || (eui = {}));
+var eui;
+(function (eui) {
+    var Skin = (function (_super) {
+        __extends(Skin, _super);
+        function Skin() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        return Skin;
+    }(PIXI.utils.EventEmitter));
+    eui.Skin = Skin;
 })(eui || (eui = {}));
 var eui;
 (function (eui) {
@@ -453,17 +498,14 @@ var eui;
         };
         Image.prototype.clearSprites = function () {
             var children = this.children;
-            if (children.length === 1) {
-                children[0].destroy(false);
+            for (var i = children.length - 1; i >= 0; i--) {
+                children[i].destroy();
             }
-            else {
-                for (var i = children.length - 1; i >= 0; i--) {
-                    children[i].destroy({
-                        children: true,
-                        texture: true,
-                        baseTexture: false,
-                    });
+            if (this._textures != null && this._textures.length > 0) {
+                for (var i = this._textures.length - 1; i >= 0; i--) {
+                    this._textures[i].destroy();
                 }
+                this._textures.length = 0;
             }
         };
         Image.prototype.generateTextureByRange = function (texture, range) {
@@ -497,10 +539,12 @@ var eui;
                 new PIXI.Rectangle(left, bottom, width, this._texture.height - bottom),
                 new PIXI.Rectangle(right, bottom, this._texture.width - right, this._texture.height - bottom),
             ];
+            this._textures = this._textures || [];
             this.clearSprites();
             for (var i = 0, len = ranges.length; i < len; i++) {
                 var texture = this.generateTextureByRange(this._texture, ranges[i]);
                 var sprite = new PIXI.Sprite(texture);
+                this._textures.push(texture);
                 this.addChild(sprite);
             }
         };
@@ -548,6 +592,126 @@ var eui;
         return Image;
     }(eui.CompatibilityContainer));
     eui.Image = Image;
+})(eui || (eui = {}));
+var eui;
+(function (eui) {
+    eui.skinDict = {};
+    eui.skinDict.Scene = JSON.parse("{\n        \"children\": [\n            {\n                \"anchorOffsetX\": \"0\",\n                \"anchorOffsetY\": \"0\",\n                \"hasChild\": false,\n                \"height\": \"607.33\",\n                \"skinName\": \"Test\",\n                \"type\": \"e:Component\",\n                \"width\": \"878\",\n                \"x\": \"81\",\n                \"x.aaa\": \"106\",\n                \"y\": \"88\",\n                \"y.aaa\": \"12\"\n            },\n            {\n                \"anchorOffsetX\": \"0\",\n                \"anchorOffsetY\": \"0\",\n                \"enabled\": \"true\",\n                \"hasChild\": false,\n                \"height\": \"213\",\n                \"type\": \"e:Component\",\n                \"width\": \"204\",\n                \"x\": \"43\",\n                \"y\": \"52\"\n            }\n        ],\n        \"class\": \"Scene\",\n        \"hasChild\": true,\n        \"height\": \"768\",\n        \"hostComponent\": \"aaa\",\n        \"states\": \"aaa\",\n        \"type\": \"e:Skin\",\n        \"width\": \"1024\"\n    }\n\n    ");
+    eui.skinDict.Test = JSON.parse("{\n        \"children\": [\n            {\n                \"hasChild\": false,\n                \"id\": \"15bec211e0b\",\n                \"type\": \"w:Config\"\n            },\n            {\n                \"anchorOffsetX\": \"0\",\n                \"anchorOffsetY\": \"0\",\n                \"hasChild\": false,\n                \"height\": \"100%\",\n                \"horizontalCenter\": \"0\",\n                \"rotation\": \"0\",\n                \"scaleX\": \"1\",\n                \"scaleY\": \"1\",\n                \"skewX\": \"0\",\n                \"skewY\": \"0\",\n                \"source\": \"assets/scene_bg3.png\",\n                \"type\": \"e:Image\",\n                \"verticalCenter\": \"0\",\n                \"width\": \"100%\"\n            },\n            {\n                \"bottom\": \"20\",\n                \"hasChild\": false,\n                \"left\": \"20\",\n                \"minHeight\": \"40\",\n                \"minWidth\": \"40\",\n                \"right\": \"20\",\n                \"source\": \"assets/ccc/loding_icon.png\",\n                \"top\": \"20\",\n                \"type\": \"e:Image\"\n            },\n            {\n                \"hasChild\": false,\n                \"icon\": \"fst_1_1_png\",\n                \"label\": \"Button\",\n                \"skinName\": \"ButtonSkin\",\n                \"type\": \"e:Button\",\n                \"x\": \"300\",\n                \"y\": \"50\"\n            }\n        ],\n        \"class\": \"Test\",\n        \"hasChild\": true,\n        \"height\": \"250\",\n        \"type\": \"e:Skin\",\n        \"width\": \"500\",\n        \"xmlns:e\": \"http://ns.egret.com/eui\",\n        \"xmlns:ns1\": \"*\",\n        \"xmlns:w\": \"http://ns.egret.com/wing\"\n    }");
+    eui.skinDict.ButtonSkin = JSON.parse("{\n        \"children\": [\n            {\n                \"anchorOffsetX\": \"0\",\n                \"anchorOffsetY\": \"0\",\n                \"bottom.down\": \"20\",\n                \"hasChild\": false,\n                \"height.down\": \"210\",\n                \"id\": \"iconDisplay\",\n                \"left.down\": \"20\",\n                \"right.down\": \"20\",\n                \"scaleX.disable\": \"1\",\n                \"scaleY.disable\": \"1\",\n                \"source\": \"assets/bbb/fst_1_1.png\",\n                \"source.disable\": \"assets/aaa/default_boy_mc.png\",\n                \"top.down\": \"20\",\n                \"type\": \"e:Image\",\n                \"width.down\": \"210\",\n                \"x.disable\": \"62.52\",\n                \"x.up\": \"0\",\n                \"y.disable\": \"39.39\",\n                \"y.up\": \"0\"\n            },\n            {\n                \"hasChild\": false,\n                \"includeIn\": \"disable\",\n                \"text\": \"disable\",\n                \"type\": \"e:Label\",\n                \"x\": \"154\",\n                \"y\": \"9.39\"\n            },\n            {\n                \"hasChild\": false,\n                \"includeIn\": \"up,down\",\n                \"text\": \"up\",\n                \"text.down\": \"down\",\n                \"type\": \"e:Label\",\n                \"x.disable\": \"16\",\n                \"x.down\": \"0\",\n                \"y\": \"24\",\n                \"y.down\": \"165\",\n                \"y.up\": \"20\"\n            }\n        ],\n        \"class\": \"ButtonSkin\",\n        \"currentState\": \"up\",\n        \"hasChild\": true,\n        \"states\": \"up,down,disable\",\n        \"type\": \"e:Skin\",\n        \"xmlns:e\": \"http://ns.egret.com/eui\",\n        \"xmlns:w\": \"http://ns.egret.com/wing\"\n    }");
+    eui.varsDict = {};
+    var assignmentOrder = {
+        Component: [],
+    };
+    var varsHandler = {
+        states: function (target, value) {
+            var states = value.split(',');
+            target.states = states;
+            if (states.length > 0 && target.currentState == null) {
+                target.currentState = states[0];
+            }
+        },
+        x: function (target, value) {
+            target.x = parseFloat(value) || target.x;
+        },
+        y: function (target, value) {
+            target.y = parseFloat(value) || target.y;
+        },
+        visbile: function (target, value) {
+        },
+        width: function (target, value) {
+        },
+        height: function (target, value) {
+        },
+        alpha: function (target, value) {
+            target.alpha = parseFloat(value) || target.alpha;
+        },
+        anchorOffsetX: function (target, value) {
+            target.anchorOffsetX = parseFloat(value) || target.anchorOffsetX;
+        },
+        anchorOffsetY: function (target, value) {
+            target.anchorOffsetY = parseFloat(value) || target.anchorOffsetY;
+        },
+        skewX: function (target, value) {
+            target.skewX = parseFloat(value) || target.skewX;
+        },
+        skewY: function (target, value) {
+            target.skewY = parseFloat(value) || target.skewY;
+        },
+        scaleX: function (target, value) {
+        },
+        scaleY: function (target, value) {
+        },
+        rotation: function (target, value) {
+            target.rotation = parseFloat(value) || target.rotation;
+        },
+        touchEnable: function (target, value) {
+            target.interactive = getBoolean(value);
+        },
+        touchChildren: function (target, value) {
+            target.interactiveChildren = getBoolean(value);
+        },
+        enable: function (target, value) {
+            target.enable = getBoolean(value);
+        },
+        name: function (target, value) {
+            target.name = value;
+        },
+        id: function (target, value) {
+            target.id = value;
+        },
+        hostComponentKey: function (target, value) {
+            target.hostComponentKey = value;
+        },
+        includeIn: function (target, value, parent) {
+            var states = value.split(',');
+            if (parent && parent.currentState != null) {
+                var visbile = false;
+                for (var i = 0; i < states.length; i++) {
+                    if (states[i] === parent.currentState) {
+                        visbile = true;
+                        break;
+                    }
+                }
+                target.visible = visbile;
+            }
+        },
+    };
+    eui.createComponentDict = {
+        Component: function (config) {
+            var instance = new eui.Component();
+            return instance;
+        },
+        Group: function (config) {
+        },
+    };
+    function parseSkin(config, component) {
+        if (config == null) {
+            return null;
+        }
+        var type = config.type;
+        type = type.substr(2, type.length - 2);
+        var instance;
+        if (component == null) {
+            instance = new eui.Component();
+        }
+        else {
+        }
+        var handler = eui.createComponentDict[type];
+        if (handler != null) {
+            instance = handler(config);
+        }
+        return instance;
+    }
+    eui.parseSkin = parseSkin;
+    function getBoolean(value) {
+        if (value === 'true' || value === true) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
 })(eui || (eui = {}));
 var stats = new Stats();
 stats.showPanel(0);

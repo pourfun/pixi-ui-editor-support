@@ -158,16 +158,14 @@ namespace eui {
 
         private clearSprites(): void {
             let children: PIXI.Sprite[] = this.children as PIXI.Sprite[];
-            if (children.length === 1) {
-                children[0].destroy(false);
-            } else {
-                for (let i: number = children.length - 1; i >= 0; i--) {
-                    children[i].destroy({
-                        children: true,
-                        texture: true,
-                        baseTexture: false,
-                    });
+            for (let i: number = children.length - 1; i >= 0; i--) {
+                children[i].destroy();
+            }
+            if (this._textures != null && this._textures.length > 0) {
+                for (let i: number = this._textures.length - 1; i >= 0; i--) {
+                    this._textures[i].destroy();
                 }
+                this._textures.length = 0;
             }
         }
 
@@ -185,6 +183,7 @@ namespace eui {
         }
 
 
+        private _textures: PIXI.Texture[];
         private generateSprites(): void {
             if (this._texture == null) {
                 return;
@@ -207,10 +206,12 @@ namespace eui {
                 new PIXI.Rectangle(right, bottom, this._texture.width - right, this._texture.height - bottom),
             ];
 
+            this._textures = this._textures || [];
             this.clearSprites();
             for (let i: number = 0, len: number = ranges.length; i < len; i++) {
                 let texture: PIXI.Texture = this.generateTextureByRange(this._texture, ranges[i]);
                 let sprite: PIXI.Sprite = new PIXI.Sprite(texture);
+                this._textures.push(texture);
                 this.addChild(sprite);
             }
         }

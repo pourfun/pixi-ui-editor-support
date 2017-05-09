@@ -1,10 +1,12 @@
 /// <reference path='../libs/pixi.js.d.ts'/>
 
 /// <reference path='./Constant.ts'/>
+/// <reference path='./Event.ts'/>
 /// <reference path='./types/UIComponent.ts'/>
 
 /// <reference path='./CompatibilityContainer.ts'/>
 
+/// <reference path='./components/Skin.ts'/>
 /// <reference path='./components/BitmapLabel.ts'/>
 /// <reference path='./components/Button.ts'/>
 /// <reference path='./components/CheckBox.ts'/>
@@ -37,7 +39,7 @@
 /// <reference path='./layouts/TileLayout.ts'/>
 /// <reference path='./layouts/VerticalLayout.ts'/>
 
-
+/// <reference path='./utils/ConfigParser.ts'/>
 
 
 
