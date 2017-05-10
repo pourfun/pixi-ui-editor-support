@@ -10,11 +10,9 @@ namespace eui {
 
         constructor() {
             super();
-            this._type = TYPE_COMPONENT;
         }
 
-
-        public vars: ComponentVariables = {};
+        protected vars: ComponentVariables;
 
 
         public set enable(value: boolean) {

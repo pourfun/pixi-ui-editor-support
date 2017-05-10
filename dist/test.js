@@ -27,16 +27,8 @@ var eui;
             _this.vars = {};
             _this.on(eui.EVENT_ADDED, _this.onAdded, _this);
             _this.on(eui.EVENT_REMOVED, _this.onRemoved, _this);
-            _this.vars.stateConfigDict = {};
             return _this;
         }
-        Object.defineProperty(CompatibilityContainer.prototype, "type", {
-            get: function () {
-                return this._type;
-            },
-            enumerable: true,
-            configurable: true
-        });
         Object.defineProperty(CompatibilityContainer.prototype, "skewX", {
             get: function () {
                 return this.skew.x;
@@ -167,47 +159,126 @@ var eui;
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(CompatibilityContainer.prototype, "percentWidth", {
+            get: function () {
+                return this.vars.percentWidth;
+            },
+            set: function (value) {
+                this.vars.percentWidth = +value;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CompatibilityContainer.prototype, "percentHeight", {
+            get: function () {
+                return this.vars.percentHeight;
+            },
+            set: function (value) {
+                this.vars.percentHeight = +value;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CompatibilityContainer.prototype, "explicitWidth", {
+            get: function () {
+                return this.vars.explicitWidth;
+            },
+            set: function (value) {
+                this.vars.explicitWidth = +value;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CompatibilityContainer.prototype, "explicitHeight", {
+            get: function () {
+                return this.vars.explicitHeight;
+            },
+            set: function (value) {
+                this.vars.explicitHeight = +value;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(CompatibilityContainer.prototype, "states", {
             get: function () {
                 return this.vars.states;
             },
             set: function (value) {
-                if (value == null) {
-                    return;
-                }
                 this.vars.states = value;
             },
             enumerable: true,
             configurable: true
         });
-        CompatibilityContainer.prototype.hasState = function (value) {
-            if (this.vars.states == null) {
-                return false;
-            }
-            var states = this.vars.states;
-            for (var i = 0; i < states.length; i++) {
-                if (states[i] === value) {
-                    return true;
-                }
-            }
-            return false;
-        };
         Object.defineProperty(CompatibilityContainer.prototype, "currentState", {
             get: function () {
                 return this.vars.currentState;
             },
             set: function (value) {
-                var newState = this.vars.states[value];
-                if (newState == null || newState === this.vars.currentState) {
+                if (this.vars.stateConfigDict == null) {
+                    return;
+                }
+                var config = this.vars.stateConfigDict[value];
+                if (config == null) {
                     return;
                 }
                 this.vars.currentState = value;
+                this.updateConfigDisplay(config);
             },
             enumerable: true,
             configurable: true
         });
-        CompatibilityContainer.prototype.addStateConfig = function (state, config) {
-            this.vars.stateConfigDict[state] = config;
+        CompatibilityContainer.prototype.updateConfigDisplay = function (config) {
+            eui.setComponentProperties(this, config);
+        };
+        Object.defineProperty(CompatibilityContainer.prototype, "config", {
+            get: function () {
+                return this.vars.config;
+            },
+            set: function (value) {
+                this.vars.config = value;
+                this.vars.stateConfigDict = this.parseConfig(value);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        CompatibilityContainer.prototype.parseConfig = function (skinConfig) {
+            var config = {};
+            var defaultConfig = {};
+            for (var key in skinConfig) {
+                if (!skinConfig.hasOwnProperty(key)) {
+                    continue;
+                }
+                var value = skinConfig[key];
+                var subs = key.split('.');
+                if (subs.length === 1) {
+                    defaultConfig[key] = value;
+                }
+                else if (subs.length === 2) {
+                    var state = subs[1];
+                    if (config[state] == null) {
+                        config[state] = {};
+                    }
+                    config[state][subs[0]] = value;
+                }
+                else {
+                }
+            }
+            for (var cfgKey in config) {
+                if (!config.hasOwnProperty(cfgKey)) {
+                    continue;
+                }
+                var stateConfig = config[cfgKey];
+                for (var key in defaultConfig) {
+                    if (!defaultConfig.hasOwnProperty(key)) {
+                        continue;
+                    }
+                    if (stateConfig[key] != null) {
+                        continue;
+                    }
+                    stateConfig[key] = defaultConfig[key];
+                }
+            }
+            return config;
         };
         CompatibilityContainer.prototype.onAdded = function (parent) {
         };
@@ -240,10 +311,7 @@ var eui;
     var Component = (function (_super) {
         __extends(Component, _super);
         function Component() {
-            var _this = _super.call(this) || this;
-            _this.vars = {};
-            _this._type = eui.TYPE_COMPONENT;
-            return _this;
+            return _super.call(this) || this;
         }
         Object.defineProperty(Component.prototype, "enable", {
             get: function () {
@@ -344,15 +412,9 @@ var eui;
         }
         Object.defineProperty(Image.prototype, "width", {
             get: function () {
-                if (this._scale9Grid != null) {
-                    return this._scale9Width;
-                }
-                else {
-                    return this.scale.x * this.getLocalBounds().width;
-                }
+                return this.scale.x * this.getLocalBounds().width;
             },
             set: function (value) {
-                this._scale9Width = value;
                 if (this._scale9Grid != null) {
                     this.updateLocs();
                 }
@@ -372,15 +434,9 @@ var eui;
         });
         Object.defineProperty(Image.prototype, "height", {
             get: function () {
-                if (this._scale9Grid != null) {
-                    return this._scale9Height;
-                }
-                else {
-                    return this.scale.y * this.getLocalBounds().height;
-                }
+                return this.scale.y * this.getLocalBounds().height;
             },
             set: function (value) {
-                this._scale9Height = value;
                 if (this._scale9Grid != null) {
                     this.updateLocs();
                 }
@@ -476,8 +532,8 @@ var eui;
                 var sprite = new PIXI.Sprite();
                 sprite.texture = this._texture || PIXI.Texture.EMPTY;
                 this.addChild(sprite);
-                this.width = this._scale9Width || this._texture.frame.width;
-                this.height = this._scale9Height || this._texture.frame.height;
+                this.width = this.vars.explicitWidth;
+                this.height = this.vars.explicitHeight;
             }
             else {
                 var configList = this._scale9Grid.split(',');
@@ -490,8 +546,6 @@ var eui;
                 this._range.height = parseInt(configList[3], 10);
                 this.scale.x = 1;
                 this.scale.y = 1;
-                this._scale9Width = this._scale9Width || this._texture.frame.width;
-                this._scale9Height = this._scale9Height || this._texture.frame.height;
                 this.generateSprites();
                 this.updateLocs();
             }
@@ -555,20 +609,22 @@ var eui;
             }
             var boundX = children[0].width + children[2].width;
             var boundY = children[0].height + children[6].height;
-            if (this._scale9Width >= boundX) {
+            var thisWidth = this.vars.explicitWidth;
+            var thisHeight = this.vars.explicitHeight;
+            if (thisWidth >= boundX) {
                 children[0].scale.x = children[2].scale.x = children[3].scale.x = children[5].scale.x = children[6].scale.x = children[8].scale.x = 1;
-                children[1].width = children[4].width = children[7].width = this._scale9Width - boundX;
+                children[1].width = children[4].width = children[7].width = thisWidth - boundX;
             }
             else {
-                children[0].width = children[2].width = children[3].width = children[5].width = children[6].width = children[8].width = this._scale9Width * 0.5;
+                children[0].width = children[2].width = children[3].width = children[5].width = children[6].width = children[8].width = thisWidth * 0.5;
                 children[1].width = children[4].width = children[7].width = 0;
             }
-            if (this._scale9Height >= boundY) {
+            if (thisHeight >= boundY) {
                 children[0].scale.y = children[1].scale.y = children[2].scale.y = children[6].scale.y = children[7].scale.y = children[8].scale.y = 1;
-                children[3].height = children[4].height = children[5].height = this._scale9Height - boundY;
+                children[3].height = children[4].height = children[5].height = thisHeight - boundY;
             }
             else {
-                children[0].height = children[1].height = children[2].height = children[6].height = children[7].height = children[8].height = this._scale9Height * 0.5;
+                children[0].height = children[1].height = children[2].height = children[6].height = children[7].height = children[8].height = thisHeight * 0.5;
                 children[3].height = children[4].height = children[5].height = 0;
             }
             var w1 = children[0].width;
@@ -596,20 +652,10 @@ var eui;
 var eui;
 (function (eui) {
     eui.skinDict = {};
-    eui.skinDict.Scene = JSON.parse("{\n        \"children\": [\n            {\n                \"anchorOffsetX\": \"0\",\n                \"anchorOffsetY\": \"0\",\n                \"hasChild\": false,\n                \"height\": \"607.33\",\n                \"skinName\": \"Test\",\n                \"type\": \"e:Component\",\n                \"width\": \"878\",\n                \"x\": \"81\",\n                \"x.aaa\": \"106\",\n                \"y\": \"88\",\n                \"y.aaa\": \"12\"\n            },\n            {\n                \"anchorOffsetX\": \"0\",\n                \"anchorOffsetY\": \"0\",\n                \"enabled\": \"true\",\n                \"hasChild\": false,\n                \"height\": \"213\",\n                \"type\": \"e:Component\",\n                \"width\": \"204\",\n                \"x\": \"43\",\n                \"y\": \"52\"\n            }\n        ],\n        \"class\": \"Scene\",\n        \"hasChild\": true,\n        \"height\": \"768\",\n        \"hostComponent\": \"aaa\",\n        \"states\": \"aaa\",\n        \"type\": \"e:Skin\",\n        \"width\": \"1024\"\n    }\n\n    ");
-    eui.skinDict.Test = JSON.parse("{\n        \"children\": [\n            {\n                \"hasChild\": false,\n                \"id\": \"15bec211e0b\",\n                \"type\": \"w:Config\"\n            },\n            {\n                \"anchorOffsetX\": \"0\",\n                \"anchorOffsetY\": \"0\",\n                \"hasChild\": false,\n                \"height\": \"100%\",\n                \"horizontalCenter\": \"0\",\n                \"rotation\": \"0\",\n                \"scaleX\": \"1\",\n                \"scaleY\": \"1\",\n                \"skewX\": \"0\",\n                \"skewY\": \"0\",\n                \"source\": \"assets/scene_bg3.png\",\n                \"type\": \"e:Image\",\n                \"verticalCenter\": \"0\",\n                \"width\": \"100%\"\n            },\n            {\n                \"bottom\": \"20\",\n                \"hasChild\": false,\n                \"left\": \"20\",\n                \"minHeight\": \"40\",\n                \"minWidth\": \"40\",\n                \"right\": \"20\",\n                \"source\": \"assets/ccc/loding_icon.png\",\n                \"top\": \"20\",\n                \"type\": \"e:Image\"\n            },\n            {\n                \"hasChild\": false,\n                \"icon\": \"fst_1_1_png\",\n                \"label\": \"Button\",\n                \"skinName\": \"ButtonSkin\",\n                \"type\": \"e:Button\",\n                \"x\": \"300\",\n                \"y\": \"50\"\n            }\n        ],\n        \"class\": \"Test\",\n        \"hasChild\": true,\n        \"height\": \"250\",\n        \"type\": \"e:Skin\",\n        \"width\": \"500\",\n        \"xmlns:e\": \"http://ns.egret.com/eui\",\n        \"xmlns:ns1\": \"*\",\n        \"xmlns:w\": \"http://ns.egret.com/wing\"\n    }");
-    eui.skinDict.ButtonSkin = JSON.parse("{\n        \"children\": [\n            {\n                \"anchorOffsetX\": \"0\",\n                \"anchorOffsetY\": \"0\",\n                \"bottom.down\": \"20\",\n                \"hasChild\": false,\n                \"height.down\": \"210\",\n                \"id\": \"iconDisplay\",\n                \"left.down\": \"20\",\n                \"right.down\": \"20\",\n                \"scaleX.disable\": \"1\",\n                \"scaleY.disable\": \"1\",\n                \"source\": \"assets/bbb/fst_1_1.png\",\n                \"source.disable\": \"assets/aaa/default_boy_mc.png\",\n                \"top.down\": \"20\",\n                \"type\": \"e:Image\",\n                \"width.down\": \"210\",\n                \"x.disable\": \"62.52\",\n                \"x.up\": \"0\",\n                \"y.disable\": \"39.39\",\n                \"y.up\": \"0\"\n            },\n            {\n                \"hasChild\": false,\n                \"includeIn\": \"disable\",\n                \"text\": \"disable\",\n                \"type\": \"e:Label\",\n                \"x\": \"154\",\n                \"y\": \"9.39\"\n            },\n            {\n                \"hasChild\": false,\n                \"includeIn\": \"up,down\",\n                \"text\": \"up\",\n                \"text.down\": \"down\",\n                \"type\": \"e:Label\",\n                \"x.disable\": \"16\",\n                \"x.down\": \"0\",\n                \"y\": \"24\",\n                \"y.down\": \"165\",\n                \"y.up\": \"20\"\n            }\n        ],\n        \"class\": \"ButtonSkin\",\n        \"currentState\": \"up\",\n        \"hasChild\": true,\n        \"states\": \"up,down,disable\",\n        \"type\": \"e:Skin\",\n        \"xmlns:e\": \"http://ns.egret.com/eui\",\n        \"xmlns:w\": \"http://ns.egret.com/wing\"\n    }");
-    eui.varsDict = {};
-    var assignmentOrder = {
-        Component: [],
-    };
-    var varsHandler = {
+    eui.immediateVarsHandler = {
         states: function (target, value) {
             var states = value.split(',');
             target.states = states;
-            if (states.length > 0 && target.currentState == null) {
-                target.currentState = states[0];
-            }
         },
         x: function (target, value) {
             target.x = parseFloat(value) || target.x;
@@ -620,8 +666,22 @@ var eui;
         visbile: function (target, value) {
         },
         width: function (target, value) {
+            if (value.indexOf('%') !== -1) {
+                target.percentWidth = parseInt(value, 10);
+            }
+            else {
+                target.explicitWidth = +value;
+                target.width = target.explicitWidth;
+            }
         },
         height: function (target, value) {
+            if (value.indexOf('%') !== -1) {
+                target.percentHeight = parseInt(value, 10);
+            }
+            else {
+                target.explicitHeight = +value;
+                target.height = target.explicitHeight;
+            }
         },
         alpha: function (target, value) {
             target.alpha = parseFloat(value) || target.alpha;
@@ -651,9 +711,6 @@ var eui;
         touchChildren: function (target, value) {
             target.interactiveChildren = getBoolean(value);
         },
-        enable: function (target, value) {
-            target.enable = getBoolean(value);
-        },
         name: function (target, value) {
             target.name = value;
         },
@@ -676,7 +733,67 @@ var eui;
                 target.visible = visbile;
             }
         },
+        top: function (target, value) {
+            target.top = value;
+        },
+        left: function (target, value) {
+            target.left = value;
+        },
+        right: function (target, value) {
+            target.right = value;
+        },
+        bottom: function (target, value) {
+            target.bottom = value;
+        },
+        verticalCenter: function (target, value) {
+            target.verticalCenter = value;
+        },
+        horizontalCenter: function (target, value) {
+            target.horizontalCenter = value;
+        },
+        enable: function (target, value) {
+            target.enable = getBoolean(value);
+        },
+        skinName: function (target, value) {
+            target.skinName = value;
+        },
+        scale9Grid: function (target, value) {
+            target.scale9Grid = value;
+        },
+        source: function (target, value) {
+            target.source = PIXI.utils.TextureCache[value];
+        },
     };
+    eui.orderVarsHandler = {
+        currentState: function (target, value) {
+        },
+    };
+    eui.varsOrder = [];
+    eui.prohibitionVarsHandler = {};
+    function setComponentProperties(target, config) {
+        var orderVars = {};
+        for (var key in config) {
+            if (!config.hasOwnProperty(key)) {
+                continue;
+            }
+            if (eui.prohibitionVarsHandler[key] != null) {
+                continue;
+            }
+            if (eui.orderVarsHandler[key] != null) {
+                orderVars[key] = config[key];
+            }
+            else if (eui.immediateVarsHandler[key] != null) {
+                eui.immediateVarsHandler[key](target, config[key]);
+            }
+        }
+        for (var i = 0; i < eui.varsOrder.length; i++) {
+            var key = eui.varsOrder[i];
+            if (orderVars[key] != null) {
+                eui.orderVarsHandler[key](target, orderVars[key]);
+            }
+        }
+    }
+    eui.setComponentProperties = setComponentProperties;
     eui.createComponentDict = {
         Component: function (config) {
             var instance = new eui.Component();
@@ -685,25 +802,6 @@ var eui;
         Group: function (config) {
         },
     };
-    function parseSkin(config, component) {
-        if (config == null) {
-            return null;
-        }
-        var type = config.type;
-        type = type.substr(2, type.length - 2);
-        var instance;
-        if (component == null) {
-            instance = new eui.Component();
-        }
-        else {
-        }
-        var handler = eui.createComponentDict[type];
-        if (handler != null) {
-            instance = handler(config);
-        }
-        return instance;
-    }
-    eui.parseSkin = parseSkin;
     function getBoolean(value) {
         if (value === 'true' || value === true) {
             return true;
@@ -721,7 +819,7 @@ var stageWidth = 1024;
 var stageHeight = 768;
 var frameID = 0;
 var canvas = document.getElementById('canvas');
-var app = new PIXI.WebGLRenderer(stageWidth, stageHeight);
+var app = PIXI.autoDetectRenderer(stageWidth, stageHeight, { backgroundColor: 0xf0f0f0 });
 canvas.appendChild(app.view);
 var stage = new PIXI.Container();
 function render() {
@@ -731,17 +829,7 @@ function render() {
     stats.end();
 }
 render();
-PIXI.loader.add(['../assets/1.png', '../assets/2.png']);
+PIXI.loader.add([]);
 PIXI.loader.load(function (loader, res) {
-    var t1 = PIXI.utils.TextureCache['../assets/1.png'];
-    var t2 = PIXI.utils.TextureCache['../assets/2.png'];
-    for (var i = 0; i < 1; i++) {
-        var img = new eui.Image();
-        img.source = t2;
-        stage.addChild(img);
-        img.scale9Grid = '100,30,10,10';
-        img.width = 500;
-        img.height = 500;
-    }
 });
 //# sourceMappingURL=test.js.map

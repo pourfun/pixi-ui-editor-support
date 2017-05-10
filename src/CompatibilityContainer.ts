@@ -7,12 +7,18 @@ namespace eui {
         bottom?: string;
         horizontalCenter?: string;
         verticalCenter?: string;
+        percentWidth?: number;
+        percentHeight?: number;
+        explicitWidth?: number;
+        explicitHeight?: number;
 
         includeInLayout?: boolean;
         states?: string[];
-
         currentState?: string;
 
+        // 皮肤传过来的配置
+        config?: any;
+        // 存放每个状态的配置信息
         stateConfigDict?: any;
     }
 
@@ -20,26 +26,18 @@ namespace eui {
 
         constructor() {
             super();
-
+            this.vars = {};
             this.on(EVENT_ADDED, this.onAdded, this);
             this.on(EVENT_REMOVED, this.onRemoved, this);
-
-            this.vars.stateConfigDict = {};
         }
 
-        public vars: UIComponentVariables = {};
+        protected vars: UIComponentVariables;
 
 
         public id: string;
 
 
         public userData: any;
-
-
-        protected _type: string;
-        public get type(): string {
-            return this._type;
-        }
 
 
         public hostComponentKey: string;
@@ -148,49 +146,114 @@ namespace eui {
             return this.vars.verticalCenter;
         }
 
-        // 组件自身具有的状态
+
+        public set percentWidth(value: number) {
+            this.vars.percentWidth = +value;
+        }
+        public get percentWidth(): number {
+            return this.vars.percentWidth;
+        }
+
+
+        public set percentHeight(value: number) {
+            this.vars.percentHeight = +value;
+        }
+        public get percentHeight(): number {
+            return this.vars.percentHeight;
+        }
+
+
+        public set explicitWidth(value: number) {
+            this.vars.explicitWidth = +value;
+        }
+        public get explicitWidth(): number {
+            return this.vars.explicitWidth;
+        }
+
+
+        public set explicitHeight(value: number) {
+            this.vars.explicitHeight = +value;
+        }
+        public get explicitHeight(): number {
+            return this.vars.explicitHeight;
+        }
+
+
         public set states(value: string[]) {
-            if (value == null) {
-                return;
-            }
             this.vars.states = value;
         }
         public get states(): string[] {
             return this.vars.states;
         }
-        public hasState(value: string): boolean {
-            if (this.vars.states == null) {
-                return false;
-            }
-            let states: string[] = this.vars.states;
-            for (let i: number = 0; i < states.length; i ++) {
-                if (states[i] === value) {
-                    return true;
-                }
-            }
 
-            return false;
-        }
+
         public set currentState(value: string) {
-            let newState: string = this.vars.states[value];
-            if (newState == null || newState === this.vars.currentState) {
+            if (this.vars.stateConfigDict == null) {
+                return;
+            }
+            let config: any = this.vars.stateConfigDict[value];
+            if (config == null) {
                 return;
             }
             this.vars.currentState = value;
-            // TODO 更新子对象显示状态
+            this.updateConfigDisplay(config);
         }
         public get currentState(): string {
             return this.vars.currentState;
         }
-
-
-
-
-        public addStateConfig(state: string, config: any): void {
-            this.vars.stateConfigDict[state] = config;
+        protected updateConfigDisplay(config: any): void {
+            setComponentProperties(this, config);
         }
 
 
+        public set config(value: any) {
+            this.vars.config = value;
+            this.vars.stateConfigDict = this.parseConfig(value);
+        }
+        public get config(): any {
+            return this.vars.config;
+        }
+        protected parseConfig(skinConfig: any): any {
+            let config: any = {};
+            let defaultConfig: any = {};
+            for (let key in skinConfig) {
+                if (!skinConfig.hasOwnProperty(key)) {
+                    continue;
+                }
+                let value: string = skinConfig[key];
+                // 暂时使用点分隔符判定属性和状态
+                let subs: string[] = key.split('.');
+                if (subs.length === 1) {
+                    defaultConfig[key] = value;
+                } else if (subs.length === 2) {
+                    let state: string = subs[1];
+                    if (config[state] == null) {
+                        config[state] = {};
+                    }
+                    config[state][subs[0]] = value;
+                } else {
+                    // TODO throw error?
+                }
+            }
+
+            for (let cfgKey in config) {
+                if (!config.hasOwnProperty(cfgKey)) {
+                    continue;
+                }
+                let stateConfig = config[cfgKey];
+                for (let key in defaultConfig) {
+                    if (!defaultConfig.hasOwnProperty(key)) {
+                        continue;
+                    }
+                    if (stateConfig[key] != null) {
+                        continue;
+                    }
+                    stateConfig[key] = defaultConfig[key];
+                }
+            }
+
+            return config;
+        }
 
 
         protected onAdded(parent: PIXI.Container): void {

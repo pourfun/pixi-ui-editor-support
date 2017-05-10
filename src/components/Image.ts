@@ -7,10 +7,7 @@ namespace eui {
         }
 
 
-        protected _scale9Width: number;
-
         public set width(value: number) {
-            this._scale9Width = value;
             if (this._scale9Grid != null) {
                 this.updateLocs();
             } else {
@@ -27,18 +24,11 @@ namespace eui {
         }
 
         public get width(): number {
-            if (this._scale9Grid != null) {
-                return this._scale9Width;
-            } else {
-                return this.scale.x * this.getLocalBounds().width;
-            }
+            return this.scale.x * this.getLocalBounds().width;
         }
 
 
-        protected _scale9Height: number;
-
         public set height(value: number) {
-            this._scale9Height = value;
             if (this._scale9Grid != null) {
                 this.updateLocs();
             } else {
@@ -55,11 +45,7 @@ namespace eui {
         }
 
         public get height(): number {
-            if (this._scale9Grid != null) {
-                return this._scale9Height;
-            } else {
-                return this.scale.y * this.getLocalBounds().height;
-            }
+            return this.scale.y * this.getLocalBounds().height;
         }
 
 
@@ -135,8 +121,8 @@ namespace eui {
                 let sprite: PIXI.Sprite = new PIXI.Sprite();
                 sprite.texture = this._texture || PIXI.Texture.EMPTY;
                 this.addChild(sprite);
-                this.width = this._scale9Width || this._texture.frame.width;
-                this.height = this._scale9Height || this._texture.frame.height;
+                this.width = this.vars.explicitWidth;
+                this.height = this.vars.explicitHeight;
             } else {
                 let configList: string[] = this._scale9Grid.split(',');
                 if (configList.length < 4) {
@@ -148,8 +134,6 @@ namespace eui {
                 this._range.height = parseInt(configList[3], 10);
                 this.scale.x = 1;
                 this.scale.y = 1;
-                this._scale9Width = this._scale9Width || this._texture.frame.width;
-                this._scale9Height = this._scale9Height || this._texture.frame.height;
                 this.generateSprites();
                 this.updateLocs();
             }
@@ -223,18 +207,20 @@ namespace eui {
             }
             let boundX: number = children[0].width + children[2].width;
             let boundY: number = children[0].height + children[6].height;
-            if (this._scale9Width >= boundX) {
+            let thisWidth: number = this.vars.explicitWidth;
+            let thisHeight: number = this.vars.explicitHeight;
+            if (thisWidth >= boundX) {
                 children[0].scale.x = children[2].scale.x = children[3].scale.x = children[5].scale.x = children[6].scale.x = children[8].scale.x = 1;
-                children[1].width = children[4].width = children[7].width = this._scale9Width - boundX;
+                children[1].width = children[4].width = children[7].width = thisWidth - boundX;
             } else {
-                children[0].width = children[2].width = children[3].width = children[5].width = children[6].width = children[8].width = this._scale9Width * 0.5;
+                children[0].width = children[2].width = children[3].width = children[5].width = children[6].width = children[8].width = thisWidth * 0.5;
                 children[1].width = children[4].width = children[7].width = 0;
             }
-            if (this._scale9Height >= boundY) {
+            if (thisHeight >= boundY) {
                 children[0].scale.y = children[1].scale.y = children[2].scale.y = children[6].scale.y = children[7].scale.y = children[8].scale.y = 1;
-                children[3].height = children[4].height = children[5].height = this._scale9Height - boundY;
+                children[3].height = children[4].height = children[5].height = thisHeight - boundY;
             } else {
-                children[0].height = children[1].height = children[2].height = children[6].height = children[7].height = children[8].height = this._scale9Height * 0.5;
+                children[0].height = children[1].height = children[2].height = children[6].height = children[7].height = children[8].height = thisHeight * 0.5;
                 children[3].height = children[4].height = children[5].height = 0;
             }
             let w1: number = children[0].width;

@@ -17,7 +17,7 @@ let canvas: HTMLCanvasElement = document.getElementById('canvas') as HTMLCanvasE
 // }, false);
 // let stage: PIXI.Container = app.stage;
 // canvas.appendChild(app.view);
-let app = new PIXI.WebGLRenderer(stageWidth, stageHeight);
+let app = PIXI.autoDetectRenderer(stageWidth, stageHeight, {backgroundColor: 0xf0f0f0});
 canvas.appendChild(app.view);
 let stage = new PIXI.Container();
 function render() {
@@ -29,17 +29,7 @@ function render() {
 }
 render();
 
-PIXI.loader.add(['../assets/1.png', '../assets/2.png']);
+PIXI.loader.add([]);
 PIXI.loader.load((loader: PIXI.loaders.Loader, res: {[key: string]: PIXI.loaders.Resource}) => {
-    let t1: PIXI.Texture = PIXI.utils.TextureCache['../assets/1.png'];
-    let t2: PIXI.Texture = PIXI.utils.TextureCache['../assets/2.png'];
-    for (let i: number = 0; i < 1; i ++) {
-        let img: eui.Image = new eui.Image();
-        img.source = t2;
-        stage.addChild(img);
-        img.scale9Grid = '100,30,10,10';
-        img.width = 500;
-        img.height = 500;
-    }
 });
 
