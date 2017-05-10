@@ -5,7 +5,40 @@ namespace eui {
 
     };
 
+    const propertiesConfigVars: string[] = [
+        'type',
+        'skinName',
+        // TODO
+        'source',
+        'scale9Grid',
 
+        'x',
+        'y',
+        'visbile',
+        'width',
+        'height',
+        'alpha',
+        'anchorOffsetX',
+        'anchorOffsetY',
+        'skewX',
+        'skewY',
+        'scaleX',
+        'scaleY',
+        'rotation',
+        'touchEnable',
+        'touchChildren',
+        'name',
+        'id',
+        'hostComponentKey',
+        'includeIn',
+        'includeInLayout',
+        'top',
+        'left',
+        'right',
+        'bottom',
+        'verticalCenter',
+        'horizontalCenter',
+    ];
     export interface ComponentConfig {
         states?: string;
 
@@ -24,8 +57,6 @@ namespace eui {
         rotation?: string;
         touchEnable?: string;
         touchChildren?: string;
-        enable?: string;
-
         name?: string;
         id?: string;
         hostComponentKey?: string;
@@ -42,13 +73,14 @@ namespace eui {
         currentState?: string;
 
         skinName?: string;
+        enable?: string;
 
         scale9Grid?: string;
     }
 
 
     // 即时生效的属性
-    export const immediateVarsHandler: any = {
+    const variablesHandler: any = {
         // 通用
         states: (target: CompatibilityContainer, value: string) => {
             let states: string[] = value.split(',');
@@ -152,6 +184,31 @@ namespace eui {
             target.horizontalCenter = value;
         },
 
+        currentState: (target: CompatibilityContainer, value: string) => {
+            let children: PIXI.DisplayObject[] = target.children;
+            for (let i: number = 0; i < children.length; i ++) {
+                (children[i] as CompatibilityContainer).currentState = value;
+            }
+        },
+
+        type: (target: CompatibilityContainer, value: any) => {
+
+        },
+
+        children: (target: CompatibilityContainer, value: any) => {
+            let children: any[] = value;
+            for (let i: number = 0; i < children.length; i ++) {
+                let config: any = children[i];
+                let type: string = config.type;
+                type = type.substr(2, type.length - 1);
+                if (createComponentDict[type] != null) {
+                    let comp: CompatibilityContainer = createComponentDict[type](config);
+                    target.addChild(comp);
+                    comp.config = config;
+                }
+            }
+        },
+
 
         // Component
         enable: (target: Component, value: string) => {
@@ -169,24 +226,14 @@ namespace eui {
             target.source = PIXI.utils.TextureCache[value];
         },
     };
-    // 需要按顺序设置的属性
-    export const orderVarsHandler: any = {
-        // 通用
-        currentState: (target: CompatibilityContainer, value: string) => {
 
-        },
-
-        // Component
-    };
-    // 设置属性的顺序
-    export const varsOrder: string[] = [
-
-    ];
     // 禁止使用的属性
-    export const prohibitionVarsHandler: any = {
+    export const prohibitionVariablesHandler: any = {
 
     };
 
+
+    // 设置组件属性的顺序
 
     // 使用配置设置组件属性
     export function setComponentProperties(target: CompatibilityContainer, config: any): void {
@@ -196,24 +243,85 @@ namespace eui {
                 continue;
             }
             // 排除禁止使用的属性
-            if (prohibitionVarsHandler[key] != null) {
+            if (prohibitionVariablesHandler[key] != null) {
                 continue;
             }
-            if (orderVarsHandler[key] != null) {
-                // 取出需要按顺序设置的属性
-                orderVars[key] = config[key];
-            } else if (immediateVarsHandler[key] != null) {
-                // 设置即时生效的属性
-                immediateVarsHandler[key](target, config[key]);
+            for (let i: number = 0; i < propertiesConfigVars.length; i ++) {
+            let key: string = config[i];
+            if (config[key] != null) {
+                variablesHandler[key](target, config[key]);
             }
         }
-        // 设置按顺序设置的属性
-        for (let i: number = 0; i < varsOrder.length; i ++) {
-            let key: string = varsOrder[i];
-            if (orderVars[key] != null) {
-                orderVarsHandler[key](target, orderVars[key]);
+        }
+    }
+
+
+    // 解析皮肤时属性顺序
+    const skinConfigVars: string[] = [
+        'hostComponent',
+        'states',
+        'width',
+        'height',
+        'children',
+        'currentState',
+    ];
+    // 解析皮肤配置
+    export function parseSkinConfig(target: Component, skinName: string): void {
+        if (skinDict[skinName] == null) {
+            // TODO throw error?
+            return;
+        }
+        let skinConfig: any = skinDict[skinName];
+        for (let i: number = 0; i < skinConfigVars.length; i ++) {
+            let key: string = skinConfigVars[i];
+            if (skinConfig[key] != null) {
+                variablesHandler[key](target, skinConfig[key]);
             }
         }
+    }
+
+
+    // 根据传入配置转换成组件可用带状态的配置
+    export function convertSkinConfig(skinConfig: any): any {
+        let config: any = {};
+        let defaultConfig: any = {};
+        for (let key in skinConfig) {
+            if (!skinConfig.hasOwnProperty(key)) {
+                continue;
+            }
+            let value: string = skinConfig[key];
+            // 暂时使用点分隔符判定属性和状态
+            let subs: string[] = key.split('.');
+            if (subs.length === 1) {
+                defaultConfig[key] = value;
+            } else if (subs.length === 2) {
+                let state: string = subs[1];
+                if (config[state] == null) {
+                    config[state] = {};
+                }
+                config[state][subs[0]] = value;
+            } else {
+                // TODO throw error?
+            }
+        }
+
+        for (let cfgKey in config) {
+            if (!config.hasOwnProperty(cfgKey)) {
+                continue;
+            }
+            let stateConfig = config[cfgKey];
+            for (let key in defaultConfig) {
+                if (!defaultConfig.hasOwnProperty(key)) {
+                    continue;
+                }
+                if (stateConfig[key] != null) {
+                    continue;
+                }
+                stateConfig[key] = defaultConfig[key];
+            }
+        }
+
+        return config;
     }
 
 
@@ -225,7 +333,14 @@ namespace eui {
             return instance;
         },
         Group: (config: any) => {
+            let instance: Group = new Group();
 
+            return instance;
+        },
+        Image: (config: any) => {
+            let instance: Image = new Image();
+
+            return instance;
         },
     };
 

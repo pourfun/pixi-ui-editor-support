@@ -1,14 +1,26 @@
 namespace eui {
 
+    interface ImageVariables extends UIComponentVariables {
+        range: PIXI.Rectangle;
+        scale9Grid: string;
+        texture: PIXI.Texture;
+        scale9Textures: PIXI.Texture[];
+        source: string | PIXI.Texture;
+    }
+
     export class Image extends CompatibilityContainer {
 
         constructor() {
             super();
+
+            this.vars.range = new PIXI.Rectangle();
         }
+
+        protected vars: ImageVariables;
 
 
         public set width(value: number) {
-            if (this._scale9Grid != null) {
+            if (this.vars.scale9Grid != null) {
                 this.updateLocs();
             } else {
                 let width = this.getLocalBounds().width;
@@ -29,7 +41,7 @@ namespace eui {
 
 
         public set height(value: number) {
-            if (this._scale9Grid != null) {
+            if (this.vars.scale9Grid != null) {
                 this.updateLocs();
             } else {
                 let height = this.getLocalBounds().height;
@@ -49,17 +61,15 @@ namespace eui {
         }
 
 
-        private _range: PIXI.Rectangle = new PIXI.Rectangle();
-        protected _scale9Grid: string;
         public set scale9Grid(value: string) {
-            if (value != null && value === this._scale9Grid) {
+            if (value != null && value === this.vars.scale9Grid) {
                 return;
             }
-            this._scale9Grid = value;
+            this.vars.scale9Grid = value;
             this.updateView();
         }
         public get scale9Grid(): string {
-            return this._scale9Grid;
+            return this.vars.scale9Grid;
         }
 
 
@@ -72,32 +82,30 @@ namespace eui {
         }
 
 
-        protected _texture: PIXI.Texture;
         public get texture(): PIXI.Texture {
-            return this._texture;
+            return this.vars.texture;
         }
 
 
-        protected _source: string | PIXI.Texture;
         public set source(value: string | PIXI.Texture) {
             if (value == null) {
-                this._texture = PIXI.Texture.EMPTY;
-                this._source = null;
+                this.vars.texture = PIXI.Texture.EMPTY;
+                this.vars.source = null;
                 this.updateView();
             } else if (value instanceof PIXI.Texture) {
-                this._texture = value;
-                this._source = value;
+                this.vars.texture = value;
+                this.vars.source = value;
                 this.updateView();
             } else if (typeof value === 'string') {
                 let texture: PIXI.Texture = PIXI.utils.TextureCache[value];
-                this._source = value;
+                this.vars.source = value;
                 if (texture != null) {
-                    this._texture = texture;
-                    this._source = value;
+                    this.vars.texture = texture;
+                    this.vars.source = value;
                     this.updateView();
                 } else {
-                    this._texture = PIXI.Texture.fromImage(value as string);
-                    this._texture.once('update', () => {
+                    this.vars.texture = PIXI.Texture.fromImage(value as string);
+                    this.vars.texture.once('update', () => {
                         if (this.destroyed) {
                             return;
                         }
@@ -107,31 +115,31 @@ namespace eui {
             }
         }
         public get source(): string | PIXI.Texture {
-            return this._source;
+            return this.vars.source;
         }
 
 
         private updateView(): void {
-            if (this._scale9Grid == null) {
-                this._range.x = 0;
-                this._range.y = 0;
-                this._range.width = 0;
-                this._range.height = 0;
+            if (this.vars.scale9Grid == null) {
+                this.vars.range.x = 0;
+                this.vars.range.y = 0;
+                this.vars.range.width = 0;
+                this.vars.range.height = 0;
                 this.clearSprites();
                 let sprite: PIXI.Sprite = new PIXI.Sprite();
-                sprite.texture = this._texture || PIXI.Texture.EMPTY;
+                sprite.texture = this.vars.texture || PIXI.Texture.EMPTY;
                 this.addChild(sprite);
                 this.width = this.vars.explicitWidth;
                 this.height = this.vars.explicitHeight;
             } else {
-                let configList: string[] = this._scale9Grid.split(',');
+                let configList: string[] = this.vars.scale9Grid.split(',');
                 if (configList.length < 4) {
                     return;
                 }
-                this._range.x = parseInt(configList[0], 10);
-                this._range.y = parseInt(configList[1], 10);
-                this._range.width = parseInt(configList[2], 10);
-                this._range.height = parseInt(configList[3], 10);
+                this.vars.range.x = parseInt(configList[0], 10);
+                this.vars.range.y = parseInt(configList[1], 10);
+                this.vars.range.width = parseInt(configList[2], 10);
+                this.vars.range.height = parseInt(configList[3], 10);
                 this.scale.x = 1;
                 this.scale.y = 1;
                 this.generateSprites();
@@ -145,11 +153,11 @@ namespace eui {
             for (let i: number = children.length - 1; i >= 0; i--) {
                 children[i].destroy();
             }
-            if (this._textures != null && this._textures.length > 0) {
-                for (let i: number = this._textures.length - 1; i >= 0; i--) {
-                    this._textures[i].destroy();
+            if (this.vars.scale9Textures != null && this.vars.scale9Textures.length > 0) {
+                for (let i: number = this.vars.scale9Textures.length - 1; i >= 0; i--) {
+                    this.vars.scale9Textures[i].destroy();
                 }
-                this._textures.length = 0;
+                this.vars.scale9Textures.length = 0;
             }
         }
 
@@ -167,35 +175,34 @@ namespace eui {
         }
 
 
-        private _textures: PIXI.Texture[];
         private generateSprites(): void {
-            if (this._texture == null) {
+            if (this.vars.texture == null) {
                 return;
             }
-            let width: number = this._range.width;
-            let height: number = this._range.height;
-            let left: number = this._range.x;
+            let width: number = this.vars.range.width;
+            let height: number = this.vars.range.height;
+            let left: number = this.vars.range.x;
             let right: number = left + width;
-            let top: number = this._range.y;
+            let top: number = this.vars.range.y;
             let bottom: number = top + height;
             let ranges: PIXI.Rectangle[] = [
                 new PIXI.Rectangle(0, 0, left, top),
                 new PIXI.Rectangle(left, 0, width, top),
-                new PIXI.Rectangle(right, 0, this._texture.width - right, top),
+                new PIXI.Rectangle(right, 0, this.vars.texture.width - right, top),
                 new PIXI.Rectangle(0, top, left, height),
                 new PIXI.Rectangle(left, top, width, height),
-                new PIXI.Rectangle(right, top, this._texture.width - right, height),
-                new PIXI.Rectangle(0, bottom, left, this._texture.height - bottom),
-                new PIXI.Rectangle(left, bottom, width, this._texture.height - bottom),
-                new PIXI.Rectangle(right, bottom, this._texture.width - right, this._texture.height - bottom),
+                new PIXI.Rectangle(right, top, this.vars.texture.width - right, height),
+                new PIXI.Rectangle(0, bottom, left, this.vars.texture.height - bottom),
+                new PIXI.Rectangle(left, bottom, width, this.vars.texture.height - bottom),
+                new PIXI.Rectangle(right, bottom, this.vars.texture.width - right, this.vars.texture.height - bottom),
             ];
 
-            this._textures = this._textures || [];
+            this.vars.scale9Textures = this.vars.scale9Textures || [];
             this.clearSprites();
             for (let i: number = 0, len: number = ranges.length; i < len; i++) {
-                let texture: PIXI.Texture = this.generateTextureByRange(this._texture, ranges[i]);
+                let texture: PIXI.Texture = this.generateTextureByRange(this.vars.texture, ranges[i]);
                 let sprite: PIXI.Sprite = new PIXI.Sprite(texture);
-                this._textures.push(texture);
+                this.vars.scale9Textures.push(texture);
                 this.addChild(sprite);
             }
         }
@@ -241,7 +248,6 @@ namespace eui {
         // override super
         public destroy(options?: PIXI.IDestroyOptions | boolean): void {
             this.clearSprites();
-            this._destroyed = true;
             super.destroy(options);
         }
     }

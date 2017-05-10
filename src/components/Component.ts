@@ -1,6 +1,6 @@
 namespace eui {
 
-    export interface ComponentVariables extends UIComponentVariables {
+    interface ComponentVariables extends UIComponentVariables {
         skinName?: string;
         enable?: boolean;
     }
@@ -24,10 +24,22 @@ namespace eui {
 
 
         public set skinName(value: string) {
+            if (value == null || value === this.vars.skinName) {
+                return;
+            }
             this.vars.skinName = value;
+            this.clearChildren();
+            parseSkinConfig(this, value);
         }
         public get skinName(): string {
             return this.vars.skinName;
+        }
+
+        protected clearChildren(): void {
+            let children: PIXI.DisplayObject[] = this.children;
+            for (let i: number = children.length - 1; i >= 0 ; i --) {
+                children[i].destroy();
+            }
         }
     }
 

@@ -208,51 +208,7 @@ namespace eui {
 
         public set config(value: any) {
             this.vars.config = value;
-            this.vars.stateConfigDict = this.parseConfig(value);
-        }
-        public get config(): any {
-            return this.vars.config;
-        }
-        protected parseConfig(skinConfig: any): any {
-            let config: any = {};
-            let defaultConfig: any = {};
-            for (let key in skinConfig) {
-                if (!skinConfig.hasOwnProperty(key)) {
-                    continue;
-                }
-                let value: string = skinConfig[key];
-                // 暂时使用点分隔符判定属性和状态
-                let subs: string[] = key.split('.');
-                if (subs.length === 1) {
-                    defaultConfig[key] = value;
-                } else if (subs.length === 2) {
-                    let state: string = subs[1];
-                    if (config[state] == null) {
-                        config[state] = {};
-                    }
-                    config[state][subs[0]] = value;
-                } else {
-                    // TODO throw error?
-                }
-            }
-
-            for (let cfgKey in config) {
-                if (!config.hasOwnProperty(cfgKey)) {
-                    continue;
-                }
-                let stateConfig = config[cfgKey];
-                for (let key in defaultConfig) {
-                    if (!defaultConfig.hasOwnProperty(key)) {
-                        continue;
-                    }
-                    if (stateConfig[key] != null) {
-                        continue;
-                    }
-                    stateConfig[key] = defaultConfig[key];
-                }
-            }
-
-            return config;
+            this.vars.stateConfigDict = convertSkinConfig(value);
         }
 
 
@@ -265,6 +221,12 @@ namespace eui {
 
         }
 
+
+        // override super
+        public destroy(options?: PIXI.IDestroyOptions | boolean): void {
+            this._destroyed = true;
+            super.destroy(options);
+        }
 
         protected _destroyed: boolean;
         public get destroyed(): boolean
