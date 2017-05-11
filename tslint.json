@@ -197,14 +197,14 @@
 			"as-needed"
 		],
 		// catch 等应与前一个右括号在同一行，且应有空格隔开
-		"one-line": [
-			true,
-			"check-catch",
-			"check-finally",
-			"check-else",
-			"check-open-brace",
-			"check-whitespace"
-		],
+		// "one-line": [
+		// 	true,
+		// 	"check-catch",
+		// 	"check-finally",
+		// 	"check-else",
+		// 	"check-open-brace",
+		// 	"check-whitespace"
+		// ],
 		// 禁止一行内声明多个变量，除了 for 循环头部
 		"one-variable-per-declaration": [
 			true,

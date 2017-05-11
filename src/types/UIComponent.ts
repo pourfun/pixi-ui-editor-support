@@ -1,4 +1,5 @@
-namespace eui {
+namespace eui
+{
 
     /**
      * UIComponent 类是所有可视组件（可定制皮肤和不可定制皮肤）的基类。
@@ -7,7 +8,8 @@ namespace eui {
      * @interface UIComponent
      * @extends {PIXI.DisplayObject}
      */
-    export interface UIComponent extends PIXI.DisplayObject {
+    export interface UIComponent extends PIXI.DisplayObject
+    {
 
 
         /**

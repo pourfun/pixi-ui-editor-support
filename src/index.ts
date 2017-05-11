@@ -6,7 +6,6 @@
 
 /// <reference path='./CompatibilityContainer.ts'/>
 
-/// <reference path='./components/Skin.ts'/>
 /// <reference path='./components/BitmapLabel.ts'/>
 /// <reference path='./components/Button.ts'/>
 /// <reference path='./components/CheckBox.ts'/>
@@ -40,6 +39,7 @@
 /// <reference path='./layouts/VerticalLayout.ts'/>
 
 /// <reference path='./utils/ConfigParser.ts'/>
+/// <reference path='./utils/Manager.ts'/>
 
 
 

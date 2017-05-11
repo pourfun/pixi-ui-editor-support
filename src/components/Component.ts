@@ -1,8 +1,11 @@
-namespace eui {
+namespace eui
+{
 
-    export class Component extends CompatibilityContainer {
+    export class Component extends CompatibilityContainer
+    {
 
-        constructor() {
+        constructor()
+        {
             super();
         }
 
@@ -12,29 +15,36 @@ namespace eui {
         protected _enable: boolean;
 
 
-        public set enable(value: boolean) {
+        public set enable(value: boolean)
+        {
             this._enable = !!value;
         }
-        public get enable(): boolean {
+        public get enable(): boolean
+        {
             return this._enable;
         }
 
 
-        public set skinName(value: string) {
-            if (value == null || value === this._skinName) {
+        public set skinName(value: string)
+        {
+            if (value == null || value === this._skinName)
+            {
                 return;
             }
             this._skinName = value;
             this.clearChildren();
             ConfigParser.parseSkinConfig(this, value);
         }
-        public get skinName(): string {
+        public get skinName(): string
+        {
             return this._skinName;
         }
 
-        protected clearChildren(): void {
+        protected clearChildren(): void
+        {
             let children: PIXI.DisplayObject[] = this.children;
-            for (let i: number = children.length - 1; i >= 0 ; i --) {
+            for (let i: number = children.length - 1; i >= 0; i--)
+            {
                 children[i].destroy();
             }
         }

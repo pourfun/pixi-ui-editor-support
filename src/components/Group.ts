@@ -1,8 +1,11 @@
-namespace eui {
+namespace eui
+{
 
-    export class Group extends CompatibilityContainer {
+    export class Group extends CompatibilityContainer
+    {
 
-        constructor() {
+        constructor()
+        {
             super();
         }
 
@@ -18,42 +21,52 @@ namespace eui {
         protected _scrollEnabled: boolean;
 
 
-        public set contentWidth(value: number) {
+        public set contentWidth(value: number)
+        {
             this._contentWidth = +value;
         }
-        public get contentWidth(): number {
+        public get contentWidth(): number
+        {
             return this._contentWidth;
         }
 
 
-        public set contentHeight(value: number) {
+        public set contentHeight(value: number)
+        {
             this._contentHeight = +value;
         }
-        public get contentHeight(): number {
+        public get contentHeight(): number
+        {
             return this._contentHeight;
         }
 
 
-        public set scrollH(value: number) {
+        public set scrollH(value: number)
+        {
             this._scrollH = +value;
         }
-        public get scrollH(): number {
+        public get scrollH(): number
+        {
             return this._scrollH;
         }
 
 
-        public set scrollV(value: number) {
+        public set scrollV(value: number)
+        {
             this._scrollV = +value;
         }
-        public get scrollV(): number {
+        public get scrollV(): number
+        {
             return this._scrollV;
         }
 
 
-        public set scrollEnabled(value: boolean) {
+        public set scrollEnabled(value: boolean)
+        {
             this._scrollEnabled = !!value;
         }
-        public get scrollEnabled(): boolean {
+        public get scrollEnabled(): boolean
+        {
             return this._scrollEnabled;
         }
     }

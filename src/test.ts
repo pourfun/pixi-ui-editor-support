@@ -29,75 +29,17 @@ function render() {
 }
 render();
 
-PIXI.loader.add(['assets/ccc/loding_icon.png', 'assets/scene_bg3.png']);
+PIXI.loader.add(['assets/ccc/loding_icon.png', 'assets/scene_bg3.png', 'assets/bbb/fst_1_1.png']);
 PIXI.loader.load((loader: PIXI.loaders.Loader, res: {[key: string]: PIXI.loaders.Resource}) => {
 
-    let cfg: any = JSON.parse(`{
-        "children": [
-            {
-                "hasChild": false,
-                "id": "15bec211e0b",
-                "type": "w:Config"
-            },
-            {
-                "anchorOffsetX": "0",
-                "anchorOffsetY": "0",
-                "hasChild": false,
-                "height": "100%",
-                "horizontalCenter": "0",
-                "rotation": "0",
-                "scaleX": "1",
-                "scaleY": "1",
-                "skewX": "0",
-                "skewY": "0",
-                "source": "assets/scene_bg3.png",
-                "type": "e:Image",
-                "verticalCenter": "0",
-                "width": "100%"
-            },
-            {
-                "bottom": "20",
-                "hasChild": false,
-                "left": "20",
-                "minHeight": "40",
-                "minWidth": "40",
-                "right": "20",
-                "source": "assets/ccc/loding_icon.png",
-                "top": "20",
-                "type": "e:Image",
-                "width": "500",
-                "height": "500",
-                "scale9Grid": "114,114,75,71"
-            },
-            {
-                "hasChild": false,
-                "icon": "fst_1_1_png",
-                "label": "Button",
-                "skinName": "ButtonSkin",
-                "type": "e:Button",
-                "x": "300",
-                "y": "50"
-            }
-        ],
-        "class": "Test",
-        "hasChild": true,
-        "height": "250",
-        "type": "e:Skin",
-        "width": "500",
-        "xmlns:e": "http://ns.egret.com/eui",
-        "xmlns:ns1": "*",
-        "xmlns:w": "http://ns.egret.com/wing"
-    }`);
+    let cfg: any = `<e:Skin class="Test" width="500" height="250" xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing" xmlns:ns1="*" >
+        <e:Image anchorOffsetX="0" anchorOffsetY="0" source="assets/scene_bg3.png" rotation="0" skewX="0" skewY="0" scaleX="1" scaleY="1" width="100%" height="100%" horizontalCenter="0" verticalCenter="0"/>
+        <e:Image source="assets/ccc/loding_icon.png" minWidth="40" minHeight="40" scale9Grid="37,37,226,226" left="20" right="20" top="20" bottom="20"/>
+        <e:Button label="Button" icon="assets/bbb/fst_1_1.png" skinName="ButtonSkin" x="300" y="50"/>
+    </e:Skin>`;
     eui.skinDict['Test'] = cfg;
-
     let component: eui.Component = new eui.Component();
     eui.ConfigParser.parseSkinConfig(component, 'Test');
     stage.addChild(component);
-
-    // let img: PIXI.Sprite = new PIXI.Sprite();
-    // img.texture =  PIXI.utils.TextureCache[ 'assets/scene_bg3.png'];
-    // let img: eui.Image = new eui.Image();
-    // img.source = 'assets/ccc/loding_icon.png';
-    // stage.addChild(img);
 });
 

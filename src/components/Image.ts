@@ -1,8 +1,11 @@
-namespace eui {
+namespace eui
+{
 
-    export class Image extends CompatibilityContainer {
+    export class Image extends CompatibilityContainer
+    {
 
-        constructor() {
+        constructor()
+        {
             super();
         }
 
@@ -18,15 +21,22 @@ namespace eui {
         protected _source: string | PIXI.Texture;
 
 
-        public set width(value: number) {
-            if (this._scale9Grid != null) {
+        public set width(value: number)
+        {
+            if (this._scale9Grid != null)
+            {
                 this.updateLocs();
-            } else {
+            }
+            else
+            {
                 let width = this.getLocalBounds().width;
 
-                if (width !== 0) {
+                if (width !== 0)
+                {
                     this.scale.x = value / width;
-                } else {
+                }
+                else
+                {
                     this.scale.x = 1;
                 }
 
@@ -34,20 +44,28 @@ namespace eui {
             }
         }
 
-        public get width(): number {
+        public get width(): number
+        {
             return this.scale.x * this.getLocalBounds().width;
         }
 
 
-        public set height(value: number) {
-            if (this._scale9Grid != null) {
+        public set height(value: number)
+        {
+            if (this._scale9Grid != null)
+            {
                 this.updateLocs();
-            } else {
+            }
+            else
+            {
                 let height = this.getLocalBounds().height;
 
-                if (height !== 0) {
+                if (height !== 0)
+                {
                     this.scale.y = value / height;
-                } else {
+                }
+                else
+                {
                     this.scale.y = 1;
                 }
 
@@ -55,57 +73,75 @@ namespace eui {
             }
         }
 
-        public get height(): number {
+        public get height(): number
+        {
             return this.scale.y * this.getLocalBounds().height;
         }
 
 
-        public set scale9Grid(value: string) {
-            if (value != null && value === this._scale9Grid) {
+        public set scale9Grid(value: string)
+        {
+            if (value != null && value === this._scale9Grid)
+            {
                 return;
             }
             this._scale9Grid = value;
             this.updateView();
         }
-        public get scale9Grid(): string {
+        public get scale9Grid(): string
+        {
             return this._scale9Grid;
         }
 
 
         // TODO clip, repeat, scale
-        public set fillMode(value: string) {
+        public set fillMode(value: string)
+        {
 
         }
-        public get fillMode(): string {
+        public get fillMode(): string
+        {
             return null;
         }
 
 
-        public get texture(): PIXI.Texture {
+        public get texture(): PIXI.Texture
+        {
             return this._texture;
         }
 
 
-        public set source(value: string | PIXI.Texture) {
-            if (value == null) {
+        public set source(value: string | PIXI.Texture)
+        {
+            if (value == null)
+            {
                 this._texture = PIXI.Texture.EMPTY;
                 this._source = null;
                 this.updateView();
-            } else if (value instanceof PIXI.Texture) {
+            }
+            else if (value instanceof PIXI.Texture)
+            {
                 this._texture = value;
                 this._source = value;
                 this.updateView();
-            } else if (typeof value === 'string') {
+            }
+            else if (typeof value === 'string')
+            {
                 let texture: PIXI.Texture = PIXI.utils.TextureCache[value];
                 this._source = value;
-                if (texture != null) {
+                if (texture != null)
+                {
                     this._texture = texture;
                     this._source = value;
                     this.updateView();
-                } else {
+                }
+                else
+                {
                     this._texture = PIXI.Texture.fromImage(value as string);
-                    this._texture.once('update', () => {
-                        if (this.destroyed) {
+                    this._texture.once('update', () =>
+                    {
+                        if (this.destroyed)
+                        {
                             return;
                         }
                         this.updateView();
@@ -113,13 +149,16 @@ namespace eui {
                 }
             }
         }
-        public get source(): string | PIXI.Texture {
+        public get source(): string | PIXI.Texture
+        {
             return this._source;
         }
 
 
-        private updateView(): void {
-            if (this._scale9Grid == null) {
+        private updateView(): void
+        {
+            if (this._scale9Grid == null)
+            {
                 this._range.x = 0;
                 this._range.y = 0;
                 this._range.width = 0;
@@ -130,9 +169,12 @@ namespace eui {
                 this.addChild(sprite);
                 this.width = this._explicitWidth || sprite.texture.frame.width;
                 this.height = this._explicitHeight || sprite.texture.frame.height;
-            } else {
+            }
+            else
+            {
                 let configList: string[] = this._scale9Grid.split(',');
-                if (configList.length < 4) {
+                if (configList.length < 4)
+                {
                     return;
                 }
                 this._range.x = parseInt(configList[0], 10);
@@ -149,13 +191,17 @@ namespace eui {
         }
 
 
-        private clearSprites(): void {
+        private clearSprites(): void
+        {
             let children: PIXI.Sprite[] = this.children as PIXI.Sprite[];
-            for (let i: number = children.length - 1; i >= 0; i--) {
+            for (let i: number = children.length - 1; i >= 0; i--)
+            {
                 children[i].destroy();
             }
-            if (this._scale9Textures != null && this._scale9Textures.length > 0) {
-                for (let i: number = this._scale9Textures.length - 1; i >= 0; i--) {
+            if (this._scale9Textures != null && this._scale9Textures.length > 0)
+            {
+                for (let i: number = this._scale9Textures.length - 1; i >= 0; i--)
+                {
                     this._scale9Textures[i].destroy();
                 }
                 this._scale9Textures.length = 0;
@@ -163,7 +209,8 @@ namespace eui {
         }
 
 
-        protected generateTextureByRange(texture: PIXI.Texture, range: PIXI.Rectangle): PIXI.Texture {
+        protected generateTextureByRange(texture: PIXI.Texture, range: PIXI.Rectangle): PIXI.Texture
+        {
             let newTexture: PIXI.Texture = texture.clone();
             let frame: PIXI.Rectangle = newTexture.frame.clone();
             frame.x += range.x;
@@ -176,8 +223,10 @@ namespace eui {
         }
 
 
-        private generateSprites(): void {
-            if (this._texture == null) {
+        private generateSprites(): void
+        {
+            if (this._texture == null)
+            {
                 return;
             }
             let width: number = this._range.width;
@@ -200,7 +249,8 @@ namespace eui {
 
             this._scale9Textures = this._scale9Textures || [];
             this.clearSprites();
-            for (let i: number = 0, len: number = ranges.length; i < len; i++) {
+            for (let i: number = 0, len: number = ranges.length; i < len; i++)
+            {
                 let texture: PIXI.Texture = this.generateTextureByRange(this._texture, ranges[i]);
                 let sprite: PIXI.Sprite = new PIXI.Sprite(texture);
                 this._scale9Textures.push(texture);
@@ -208,26 +258,34 @@ namespace eui {
             }
         }
 
-        private updateLocs(): void {
+        private updateLocs(): void
+        {
             let children: PIXI.Sprite[] = this.children as PIXI.Sprite[];
-            if (children.length !== 9) {
+            if (children.length !== 9)
+            {
                 return;
             }
             let boundX: number = children[0].width + children[2].width;
             let boundY: number = children[0].height + children[6].height;
             let thisWidth: number = this._explicitWidth || this.texture.frame.width;
             let thisHeight: number = this._explicitHeight || this.texture.frame.height;
-            if (thisWidth >= boundX) {
+            if (thisWidth >= boundX)
+            {
                 children[0].scale.x = children[2].scale.x = children[3].scale.x = children[5].scale.x = children[6].scale.x = children[8].scale.x = 1;
                 children[1].width = children[4].width = children[7].width = thisWidth - boundX;
-            } else {
+            }
+            else
+            {
                 children[0].width = children[2].width = children[3].width = children[5].width = children[6].width = children[8].width = thisWidth * 0.5;
                 children[1].width = children[4].width = children[7].width = 0;
             }
-            if (thisHeight >= boundY) {
+            if (thisHeight >= boundY)
+            {
                 children[0].scale.y = children[1].scale.y = children[2].scale.y = children[6].scale.y = children[7].scale.y = children[8].scale.y = 1;
                 children[3].height = children[4].height = children[5].height = thisHeight - boundY;
-            } else {
+            }
+            else
+            {
                 children[0].height = children[1].height = children[2].height = children[6].height = children[7].height = children[8].height = thisHeight * 0.5;
                 children[3].height = children[4].height = children[5].height = 0;
             }
@@ -235,7 +293,8 @@ namespace eui {
             let w2: number = w1 + children[1].width;
             let h1: number = children[0].height;
             let h2: number = h1 + children[3].height;
-            for (let i: number = 0; i < 3; i++) {
+            for (let i: number = 0; i < 3; i++)
+            {
                 children[i * 3].x = 0 - this.anchorOffsetX;
                 children[i * 3 + 1].x = w1 - this.anchorOffsetX;
                 children[i * 3 + 2].x = w2 - this.anchorOffsetX;
@@ -247,7 +306,8 @@ namespace eui {
 
 
         // override super
-        public destroy(options?: PIXI.IDestroyOptions | boolean): void {
+        public destroy(options?: PIXI.IDestroyOptions | boolean): void
+        {
             this.clearSprites();
             super.destroy(options);
         }

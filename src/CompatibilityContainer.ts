@@ -1,8 +1,11 @@
-namespace eui {
+namespace eui
+{
 
-    export class CompatibilityContainer extends PIXI.Container implements UIComponent {
+    export class CompatibilityContainer extends PIXI.Container implements UIComponent
+    {
 
-        constructor() {
+        constructor()
+        {
             super();
             this.on(EVENT_ADDED, this.onAdded, this);
             this.on(EVENT_REMOVED, this.onRemoved, this);
@@ -47,190 +50,236 @@ namespace eui {
         public hostComponentKey: string;
 
 
-        public set skewX(value: number) {
+        public set skewX(value: number)
+        {
             this.skew.x = +value;
         }
-        public get skewX(): number {
+        public get skewX(): number
+        {
             return this.skew.x;
         }
 
 
-        public set skewY(value: number) {
+        public set skewY(value: number)
+        {
             this.skew.y = +value;
         }
-        public get skewY(): number {
+        public get skewY(): number
+        {
             return this.skew.y;
         }
 
 
-        public set scaleX(value: number) {
+        public set scaleX(value: number)
+        {
             this.scale.x = +value;
         }
-        public get scaleX(): number {
+        public get scaleX(): number
+        {
             return this.scale.x;
         }
 
 
-        public set scaleY(value: number) {
+        public set scaleY(value: number)
+        {
             this.scale.y = +value;
         }
-        public get scaleY(): number {
+        public get scaleY(): number
+        {
             return this.scale.y;
         }
 
 
-        public set anchorOffsetX(value: number) {
+        public set anchorOffsetX(value: number)
+        {
             this.pivot.x = +value;
         }
-        public get anchorOffsetX(): number {
+        public get anchorOffsetX(): number
+        {
             return this.pivot.x;
         }
 
 
-        public set anchorOffsetY(value: number) {
+        public set anchorOffsetY(value: number)
+        {
             this.pivot.y = +value;
         }
-        public get anchorOffsetY(): number {
+        public get anchorOffsetY(): number
+        {
             return this.pivot.y;
         }
 
 
-        public set includeInLayout(value: boolean) {
+        public set includeInLayout(value: boolean)
+        {
             this._includeInLayout = !!value;
         }
-        public get includeInLayout(): boolean {
+        public get includeInLayout(): boolean
+        {
             return this._includeInLayout;
         }
 
 
-        public set left(value: string) {
+        public set left(value: string)
+        {
             this._left = value.toString();
         }
-        public get left(): string {
+        public get left(): string
+        {
             return this._left;
         }
 
 
-        public set right(value: string) {
+        public set right(value: string)
+        {
             this._right = value.toString();
         }
-        public get right(): string {
+        public get right(): string
+        {
             return this._right;
         }
 
 
-        public set top(value: string) {
+        public set top(value: string)
+        {
             this._top = value.toString();
         }
-        public get top(): string {
+        public get top(): string
+        {
             return this._top;
         }
 
 
-        public set bottom(value: string) {
+        public set bottom(value: string)
+        {
             this._bottom = value.toString();
         }
-        public get bottom(): string {
+        public get bottom(): string
+        {
             return this._bottom;
         }
 
 
-        public set horizontalCenter(value: string) {
+        public set horizontalCenter(value: string)
+        {
             this._horizontalCenter = value.toString();
         }
-        public get horizontalCenter(): string {
+        public get horizontalCenter(): string
+        {
             return this._horizontalCenter;
         }
 
 
-        public set verticalCenter(value: string) {
+        public set verticalCenter(value: string)
+        {
             this._verticalCenter = value.toString();
         }
-        public get verticalCenter(): string {
+        public get verticalCenter(): string
+        {
             return this._verticalCenter;
         }
 
 
-        public set percentWidth(value: number) {
+        public set percentWidth(value: number)
+        {
             this._percentWidth = +value;
         }
-        public get percentWidth(): number {
+        public get percentWidth(): number
+        {
             return this._percentWidth;
         }
 
 
-        public set percentHeight(value: number) {
+        public set percentHeight(value: number)
+        {
             this._percentHeight = +value;
         }
-        public get percentHeight(): number {
+        public get percentHeight(): number
+        {
             return this._percentHeight;
         }
 
 
-        public set explicitWidth(value: number) {
+        public set explicitWidth(value: number)
+        {
             this._explicitWidth = +value;
         }
-        public get explicitWidth(): number {
+        public get explicitWidth(): number
+        {
             return this._explicitWidth;
         }
 
 
-        public set explicitHeight(value: number) {
+        public set explicitHeight(value: number)
+        {
             this._explicitHeight = +value;
         }
-        public get explicitHeight(): number {
+        public get explicitHeight(): number
+        {
             return this._explicitHeight;
         }
 
 
-        public set states(value: string[]) {
+        public set states(value: string[])
+        {
             this._states = value;
         }
-        public get states(): string[] {
+        public get states(): string[]
+        {
             return this._states;
         }
 
 
-        public set currentState(value: string) {
-            if (this._stateConfigDict == null) {
+        public set currentState(value: string)
+        {
+            if (this._stateConfigDict == null)
+            {
                 return;
             }
             let config: any = this._stateConfigDict[value];
-            if (config == null) {
+            if (config == null)
+            {
                 return;
             }
             this._currentState = value;
             this.updateConfigDisplay(config);
         }
-        public get currentState(): string {
+        public get currentState(): string
+        {
             return this._currentState;
         }
-        protected updateConfigDisplay(config: any): void {
+        protected updateConfigDisplay(config: any): void
+        {
             ConfigParser.setComponentAttributes(this, config);
         }
 
 
-        public set config(value: any) {
+        public set config(value: any)
+        {
             this._config = value;
             this._stateConfigDict = ConfigParser.convertSkinConfig(value);
-            if (this.currentState == null) {
+            if (this.currentState == null)
+            {
                 this.currentState = STATE_DEFAULT;
             }
         }
 
 
-        protected onAdded(parent: PIXI.Container): void {
+        protected onAdded(parent: PIXI.Container): void
+        {
 
         }
 
 
-        protected onRemoved(parent: PIXI.Container): void {
+        protected onRemoved(parent: PIXI.Container): void
+        {
 
         }
 
 
         // override super
-        public destroy(options?: PIXI.IDestroyOptions | boolean): void {
+        public destroy(options?: PIXI.IDestroyOptions | boolean): void
+        {
             this._destroyed = true;
             super.destroy(options);
         }
