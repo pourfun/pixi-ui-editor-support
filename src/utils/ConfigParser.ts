@@ -1,85 +1,13 @@
-namespace eui {
+namespace eui.ConfigParser {
 
-    // 存放所有皮肤配置
-    export const skinDict: any = {
-
+    // 根据配置构建显示对象
+    const createComponentDict: any = {
+        Component: (config: any) => new Component(),
+        Group: (config: any) => new Group(),
+        Image: (config: any) => new Image(),
     };
 
-    const propertiesConfigVars: string[] = [
-        'type',
-        'skinName',
-        // TODO
-        'source',
-        'scale9Grid',
-
-        'x',
-        'y',
-        'visbile',
-        'width',
-        'height',
-        'alpha',
-        'anchorOffsetX',
-        'anchorOffsetY',
-        'skewX',
-        'skewY',
-        'scaleX',
-        'scaleY',
-        'rotation',
-        'touchEnable',
-        'touchChildren',
-        'name',
-        'id',
-        'hostComponentKey',
-        'includeIn',
-        'includeInLayout',
-        'top',
-        'left',
-        'right',
-        'bottom',
-        'verticalCenter',
-        'horizontalCenter',
-    ];
-    export interface ComponentConfig {
-        states?: string;
-
-        x?: string;
-        y?: string;
-        visbile?: string;
-        width?: string;
-        height?: string;
-        alpha?: string;
-        anchorOffsetX?: string;
-        anchorOffsetY?: string;
-        skewX?: string;
-        skewY?: string;
-        scaleX?: string;
-        scaleY?: string;
-        rotation?: string;
-        touchEnable?: string;
-        touchChildren?: string;
-        name?: string;
-        id?: string;
-        hostComponentKey?: string;
-        includeIn?: string;
-        includeInLayout?: string;
-
-        top?: string;
-        left?: string;
-        right?: string;
-        bottom?: string;
-        verticalCenter?: string;
-        horizontalCenter?: string;
-
-        currentState?: string;
-
-        skinName?: string;
-        enable?: string;
-
-        scale9Grid?: string;
-    }
-
-
-    // 即时生效的属性
+    // 属性赋值处理方法
     const variablesHandler: any = {
         // 通用
         states: (target: CompatibilityContainer, value: string) => {
@@ -191,15 +119,12 @@ namespace eui {
             }
         },
 
-        type: (target: CompatibilityContainer, value: any) => {
-
-        },
-
         children: (target: CompatibilityContainer, value: any) => {
             let children: any[] = value;
             for (let i: number = 0; i < children.length; i ++) {
                 let config: any = children[i];
                 let type: string = config.type;
+                // TODO 配置里带了 e: 以后可能去掉
                 type = type.substr(2, type.length - 1);
                 if (createComponentDict[type] != null) {
                     let comp: CompatibilityContainer = createComponentDict[type](config);
@@ -227,44 +152,69 @@ namespace eui {
         },
     };
 
-    // 禁止使用的属性
-    export const prohibitionVariablesHandler: any = {
+    // 非法属性
+    const invalidAttributes: any = {
 
     };
 
+    // 需要在组件创建后立即按顺序赋值的属性
+    const orderAttributes: any = {
+        Component: {
+            list: ['skinName'],
+            dict: {
+                skinName: '',
+            },
+        },
 
-    // 设置组件属性的顺序
+        Image: {
+            list: ['source', 'scale9Grid'],
+            dict: {
+                skinName: '',
+                scale9Grid: '',
+            },
+        },
+    };
 
     // 使用配置设置组件属性
-    export function setComponentProperties(target: CompatibilityContainer, config: any): void {
-        let orderVars: any = {};
+    export function setComponentAttributes(target: CompatibilityContainer, config: any): void {
+        let type: string = config.type;
+        // TODO 配置里带了 e: 以后可能去掉
+        type = type.substr(2, type.length - 1);
+        let dict: any;
+        if (orderAttributes[type] != null) {
+            let list: string[] = orderAttributes[type].list;
+            dict = orderAttributes[type].dict;
+            for (let i: number = 0; i < list.length; i ++) {
+                let key: string = list[i];
+                if (config[key] != null) {
+                    variablesHandler[key](target, config[key]);
+                }
+            }
+        }
+
         for (let key in config) {
             if (!config.hasOwnProperty(key)) {
                 continue;
             }
-            // 排除禁止使用的属性
-            if (prohibitionVariablesHandler[key] != null) {
+            // 排除非法属性
+            if (invalidAttributes[key] != null) {
                 continue;
             }
-            for (let i: number = 0; i < propertiesConfigVars.length; i ++) {
-            let key: string = config[i];
-            if (config[key] != null) {
-                variablesHandler[key](target, config[key]);
+            // 已经赋值过的不再赋值
+            if (dict != null && dict[key] != null) {
+                continue;
             }
-        }
+            // 处理方法里没有的不进行赋值
+            if (variablesHandler[key] == null) {
+                continue;
+            }
+            variablesHandler[key](target, config[key]);
         }
     }
 
 
     // 解析皮肤时属性顺序
-    const skinConfigVars: string[] = [
-        'hostComponent',
-        'states',
-        'width',
-        'height',
-        'children',
-        'currentState',
-    ];
+    const skinAttributeOrder: string[] = ['hostComponent', 'states', 'width', 'height', 'children', 'currentState'];
     // 解析皮肤配置
     export function parseSkinConfig(target: Component, skinName: string): void {
         if (skinDict[skinName] == null) {
@@ -272,8 +222,8 @@ namespace eui {
             return;
         }
         let skinConfig: any = skinDict[skinName];
-        for (let i: number = 0; i < skinConfigVars.length; i ++) {
-            let key: string = skinConfigVars[i];
+        for (let i: number = 0; i < skinAttributeOrder.length; i ++) {
+            let key: string = skinAttributeOrder[i];
             if (skinConfig[key] != null) {
                 variablesHandler[key](target, skinConfig[key]);
             }
@@ -321,28 +271,10 @@ namespace eui {
             }
         }
 
+        config[STATE_DEFAULT] = defaultConfig;
+
         return config;
     }
-
-
-    // 根据配置构建显示对象
-    export const createComponentDict: any = {
-        Component: (config: any) => {
-            let instance: Component = new Component();
-
-            return instance;
-        },
-        Group: (config: any) => {
-            let instance: Group = new Group();
-
-            return instance;
-        },
-        Image: (config: any) => {
-            let instance: Image = new Image();
-
-            return instance;
-        },
-    };
 
 
     function getBoolean(value: any): boolean {

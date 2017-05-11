@@ -1,45 +1,49 @@
 namespace eui {
 
-    export interface UIComponentVariables {
-        left?: string;
-        right?: string;
-        top?: string;
-        bottom?: string;
-        horizontalCenter?: string;
-        verticalCenter?: string;
-        percentWidth?: number;
-        percentHeight?: number;
-        explicitWidth?: number;
-        explicitHeight?: number;
-
-        includeInLayout?: boolean;
-        states?: string[];
-        currentState?: string;
-
-        // 皮肤传过来的配置
-        config?: any;
-        // 存放每个状态的配置信息
-        stateConfigDict?: any;
-    }
-
     export class CompatibilityContainer extends PIXI.Container implements UIComponent {
 
         constructor() {
             super();
-            this.vars = {};
             this.on(EVENT_ADDED, this.onAdded, this);
             this.on(EVENT_REMOVED, this.onRemoved, this);
         }
 
-        protected vars: UIComponentVariables;
+        // 布局相关属性
+        protected _left: string;
+        protected _right: string;
+        protected _top: string;
+        protected _bottom: string;
+        protected _horizontalCenter: string;
+        protected _verticalCenter: string;
 
+        // 宽度比例数值
+        protected _percentWidth: number;
+        // 高度比例数值
+        protected _percentHeight: number;
+        // 指定的宽度
+        protected _explicitWidth: number;
+        // 指定的高度
+        protected _explicitHeight: number;
 
+        // 是否应用父级的布局
+        protected _includeInLayout: boolean;
+        // 状态
+        protected _states: string[];
+        // 当前状态
+        protected _currentState: string;
+
+        // 皮肤传过来的配置
+        protected _config: any;
+        // 存放每个状态的配置信息
+        protected _stateConfigDict: any;
+
+        // ID
         public id: string;
 
-
+        // 携带数据
         public userData: any;
 
-
+        // 组件唯一的KEY
         public hostComponentKey: string;
 
 
@@ -92,123 +96,126 @@ namespace eui {
 
 
         public set includeInLayout(value: boolean) {
-            this.vars.includeInLayout = !!value;
+            this._includeInLayout = !!value;
         }
         public get includeInLayout(): boolean {
-            return this.vars.includeInLayout;
+            return this._includeInLayout;
         }
 
 
         public set left(value: string) {
-            this.vars.left = value.toString();
+            this._left = value.toString();
         }
         public get left(): string {
-            return this.vars.left;
+            return this._left;
         }
 
 
         public set right(value: string) {
-            this.vars.right = value.toString();
+            this._right = value.toString();
         }
         public get right(): string {
-            return this.vars.right;
+            return this._right;
         }
 
 
         public set top(value: string) {
-            this.vars.top = value.toString();
+            this._top = value.toString();
         }
         public get top(): string {
-            return this.vars.top;
+            return this._top;
         }
 
 
         public set bottom(value: string) {
-            this.vars.bottom = value.toString();
+            this._bottom = value.toString();
         }
         public get bottom(): string {
-            return this.vars.bottom;
+            return this._bottom;
         }
 
 
         public set horizontalCenter(value: string) {
-            this.vars.horizontalCenter = value.toString();
+            this._horizontalCenter = value.toString();
         }
         public get horizontalCenter(): string {
-            return this.vars.horizontalCenter;
+            return this._horizontalCenter;
         }
 
 
         public set verticalCenter(value: string) {
-            this.vars.verticalCenter = value.toString();
+            this._verticalCenter = value.toString();
         }
         public get verticalCenter(): string {
-            return this.vars.verticalCenter;
+            return this._verticalCenter;
         }
 
 
         public set percentWidth(value: number) {
-            this.vars.percentWidth = +value;
+            this._percentWidth = +value;
         }
         public get percentWidth(): number {
-            return this.vars.percentWidth;
+            return this._percentWidth;
         }
 
 
         public set percentHeight(value: number) {
-            this.vars.percentHeight = +value;
+            this._percentHeight = +value;
         }
         public get percentHeight(): number {
-            return this.vars.percentHeight;
+            return this._percentHeight;
         }
 
 
         public set explicitWidth(value: number) {
-            this.vars.explicitWidth = +value;
+            this._explicitWidth = +value;
         }
         public get explicitWidth(): number {
-            return this.vars.explicitWidth;
+            return this._explicitWidth;
         }
 
 
         public set explicitHeight(value: number) {
-            this.vars.explicitHeight = +value;
+            this._explicitHeight = +value;
         }
         public get explicitHeight(): number {
-            return this.vars.explicitHeight;
+            return this._explicitHeight;
         }
 
 
         public set states(value: string[]) {
-            this.vars.states = value;
+            this._states = value;
         }
         public get states(): string[] {
-            return this.vars.states;
+            return this._states;
         }
 
 
         public set currentState(value: string) {
-            if (this.vars.stateConfigDict == null) {
+            if (this._stateConfigDict == null) {
                 return;
             }
-            let config: any = this.vars.stateConfigDict[value];
+            let config: any = this._stateConfigDict[value];
             if (config == null) {
                 return;
             }
-            this.vars.currentState = value;
+            this._currentState = value;
             this.updateConfigDisplay(config);
         }
         public get currentState(): string {
-            return this.vars.currentState;
+            return this._currentState;
         }
         protected updateConfigDisplay(config: any): void {
-            setComponentProperties(this, config);
+            ConfigParser.setComponentAttributes(this, config);
         }
 
 
         public set config(value: any) {
-            this.vars.config = value;
-            this.vars.stateConfigDict = convertSkinConfig(value);
+            this._config = value;
+            this._stateConfigDict = ConfigParser.convertSkinConfig(value);
+            if (this.currentState == null) {
+                this.currentState = STATE_DEFAULT;
+            }
         }
 
 
