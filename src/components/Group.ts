@@ -1,62 +1,60 @@
 namespace eui {
 
-    export interface GroupVariables extends UIComponentVariables {
-        contentWidth?: number;
-        contentHeight?: number;
-        scrollH?: number;
-        scrollV?: number;
-        scrollEnabled?: boolean;
-    }
-
     export class Group extends CompatibilityContainer {
 
         constructor() {
             super();
-
-            this._type = TYPE_GROUP;
         }
 
-
-        public vars: GroupVariables = {};
+        // 内容宽度
+        protected _contentWidth: number;
+        // 内容高度
+        protected _contentHeight: number;
+        // 横向滚动长度
+        protected _scrollH: number;
+        // 纵向滚动长度
+        protected _scrollV: number;
+        // 是否允许滚动
+        protected _scrollEnabled: boolean;
 
 
         public set contentWidth(value: number) {
-            this.vars.contentWidth = +value;
+            this._contentWidth = +value;
         }
         public get contentWidth(): number {
-            return this.vars.contentWidth;
+            return this._contentWidth;
         }
 
 
         public set contentHeight(value: number) {
-            this.vars.contentHeight = +value;
+            this._contentHeight = +value;
         }
         public get contentHeight(): number {
-            return this.vars.contentHeight;
+            return this._contentHeight;
         }
 
 
         public set scrollH(value: number) {
-            this.vars.scrollH = +value;
+            this._scrollH = +value;
         }
         public get scrollH(): number {
-            return this.vars.scrollH;
+            return this._scrollH;
         }
 
 
         public set scrollV(value: number) {
-            this.vars.scrollV = +value;
+            this._scrollV = +value;
         }
         public get scrollV(): number {
-            return this.vars.scrollV;
+            return this._scrollV;
         }
 
 
         public set scrollEnabled(value: boolean) {
-            this.vars.scrollEnabled = !!value;
+            this._scrollEnabled = !!value;
         }
         public get scrollEnabled(): boolean {
-            return this.vars.scrollEnabled;
+            return this._scrollEnabled;
         }
     }
 
