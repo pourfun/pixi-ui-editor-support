@@ -1,9 +1,7 @@
 namespace eui
 {
-
     export class Component extends CompatibilityContainer
     {
-
         constructor()
         {
             super();

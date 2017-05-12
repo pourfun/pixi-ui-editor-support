@@ -6,13 +6,13 @@
 
 /// <reference path='./CompatibilityContainer.ts'/>
 
+/// <reference path='./components/Component.ts'/>
+/// <reference path='./components/Group.ts'/>
 /// <reference path='./components/BitmapLabel.ts'/>
 /// <reference path='./components/Button.ts'/>
 /// <reference path='./components/CheckBox.ts'/>
-/// <reference path='./components/Component.ts'/>
 /// <reference path='./components/DataGroup.ts'/>
 /// <reference path='./components/EditableText.ts'/>
-/// <reference path='./components/Group.ts'/>
 /// <reference path='./components/HScrollBar.ts'/>
 /// <reference path='./components/HSlider.ts'/>
 /// <reference path='./components/Image.ts'/>
@@ -40,6 +40,7 @@
 
 /// <reference path='./utils/ConfigParser.ts'/>
 /// <reference path='./utils/Manager.ts'/>
+/// <reference path='./utils/Log.ts'/>
 
 
 

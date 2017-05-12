@@ -16,6 +16,14 @@ var eui;
 (function (eui) {
     eui.EVENT_ADDED = 'added';
     eui.EVENT_REMOVED = 'removed';
+    eui.EVENT_POINTER_CANCEL = 'pointercancel';
+    eui.EVENT_POINTER_DOWN = 'pointerdown';
+    eui.EVENT_POINTER_MOVE = 'pointermove';
+    eui.EVENT_POINTER_OUT = 'pointerout';
+    eui.EVENT_POINTER_OVER = 'pointerover';
+    eui.EVENT_POINTER_TAP = 'pointertap';
+    eui.EVENT_POINTER_UP = 'pointerup';
+    eui.EVENT_POINTER_OUTSIDE = 'pointerupoutside';
 })(eui || (eui = {}));
 var eui;
 (function (eui) {
@@ -23,8 +31,7 @@ var eui;
         __extends(CompatibilityContainer, _super);
         function CompatibilityContainer() {
             var _this = _super.call(this) || this;
-            _this.on(eui.EVENT_ADDED, _this.onAdded, _this);
-            _this.on(eui.EVENT_REMOVED, _this.onRemoved, _this);
+            _this.addListeners();
             return _this;
         }
         Object.defineProperty(CompatibilityContainer.prototype, "skewX", {
@@ -239,11 +246,96 @@ var eui;
             enumerable: true,
             configurable: true
         });
+        CompatibilityContainer.prototype.addListeners = function () {
+            this.on(eui.EVENT_ADDED, this.onAdded, this);
+            this.on(eui.EVENT_REMOVED, this.onRemoved, this);
+            this.on(eui.EVENT_POINTER_CANCEL, this.onPointerCancel, this);
+            this.on(eui.EVENT_POINTER_DOWN, this.onPointerDown, this);
+            this.on(eui.EVENT_POINTER_MOVE, this.onPointerMove, this);
+            this.on(eui.EVENT_POINTER_OUT, this.onPointerOut, this);
+            this.on(eui.EVENT_POINTER_OVER, this.onPointerOver, this);
+            this.on(eui.EVENT_POINTER_TAP, this.onPointerTap, this);
+            this.on(eui.EVENT_POINTER_UP, this.onPointerUp, this);
+            this.on(eui.EVENT_POINTER_OUTSIDE, this.onPointerOutside, this);
+        };
+        CompatibilityContainer.prototype.removeListeners = function () {
+            this.off(eui.EVENT_ADDED, this.onAdded, this);
+            this.off(eui.EVENT_REMOVED, this.onRemoved, this);
+            this.off(eui.EVENT_POINTER_CANCEL, this.onPointerCancel, this);
+            this.off(eui.EVENT_POINTER_DOWN, this.onPointerDown, this);
+            this.off(eui.EVENT_POINTER_MOVE, this.onPointerMove, this);
+            this.off(eui.EVENT_POINTER_OUT, this.onPointerOut, this);
+            this.off(eui.EVENT_POINTER_OVER, this.onPointerOver, this);
+            this.off(eui.EVENT_POINTER_TAP, this.onPointerTap, this);
+            this.off(eui.EVENT_POINTER_UP, this.onPointerUp, this);
+            this.off(eui.EVENT_POINTER_OUTSIDE, this.onPointerOutside, this);
+        };
         CompatibilityContainer.prototype.onAdded = function (parent) {
         };
         CompatibilityContainer.prototype.onRemoved = function (parent) {
         };
+        CompatibilityContainer.prototype.onPointerCancel = function (evt) {
+        };
+        CompatibilityContainer.prototype.onPointerDown = function (evt) {
+        };
+        CompatibilityContainer.prototype.onPointerMove = function (evt) {
+        };
+        CompatibilityContainer.prototype.onPointerOut = function (evt) {
+        };
+        CompatibilityContainer.prototype.onPointerOver = function (evt) {
+        };
+        CompatibilityContainer.prototype.onPointerTap = function (evt) {
+        };
+        CompatibilityContainer.prototype.onPointerUp = function (evt) {
+        };
+        CompatibilityContainer.prototype.onPointerOutside = function (evt) {
+        };
+        CompatibilityContainer.prototype.getReference = function (id) {
+            if (id == null) {
+                return null;
+            }
+            function bind(container, value) {
+                var children = container.children;
+                for (var i = 0, lenI = children.length; i < lenI; i++) {
+                    var child = children[i];
+                    if (child.id != null && child.id !== '') {
+                        this._referenceDict[child.id] = value + i.toString() + ',';
+                    }
+                    if (child instanceof PIXI.Container) {
+                        bind.call(this, child, value + i.toString() + ',');
+                    }
+                }
+            }
+            if (this._referenceDict == null) {
+                this._referenceDict = {};
+                bind.call(this, this, '');
+            }
+            if (this._referenceDict[id] == null) {
+                return null;
+            }
+            var value = this._referenceDict[id];
+            var list = value.split(',');
+            if (list[list.length - 1] === '') {
+                list.pop();
+            }
+            var container = this;
+            for (var i = 0; i < list.length; i++) {
+                var child = container.children[parseInt(list[i], 10)];
+                if (child == null) {
+                    break;
+                }
+                container = child;
+                if (i === list.length - 1) {
+                    if (child.id === id) {
+                        return child;
+                    }
+                }
+            }
+            this._referenceDict = {};
+            return this.getReference(name);
+        };
         CompatibilityContainer.prototype.destroy = function (options) {
+            this.removeAllListeners();
             this._destroyed = true;
             _super.prototype.destroy.call(this, options);
         };
@@ -363,10 +455,85 @@ var eui;
 })(eui || (eui = {}));
 var eui;
 (function (eui) {
+    var Button = (function (_super) {
+        __extends(Button, _super);
+        function Button() {
+            var _this = _super.call(this) || this;
+            _this._label = '';
+            _this._icon = null;
+            _this.interactive = true;
+            return _this;
+        }
+        Object.defineProperty(Button.prototype, "label", {
+            get: function () {
+                return this._label;
+            },
+            set: function (value) {
+                this._label = value;
+                var labelDisplay = this.getReference('labelDisplay');
+                if (labelDisplay) {
+                    labelDisplay.text = value;
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Button.prototype, "icon", {
+            get: function () {
+                return this._icon;
+            },
+            set: function (value) {
+                this._icon = value;
+                var iconDisplay = this.getReference('iconDisplay');
+                if (iconDisplay) {
+                    iconDisplay.source = value;
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Button.prototype.onPointerDown = function (evt) {
+            this._downPoint = evt.data.global.clone();
+            this.currentState = 'down';
+        };
+        Button.prototype.onPointerMove = function (evt) {
+            if (this._downPoint == null) {
+                return;
+            }
+            var pt = evt.data.global;
+            if (Math.abs(pt.x - this._downPoint.x) > 10 || Math.abs(pt.y - this._downPoint.y) > 10) {
+                this._downPoint = null;
+                this.currentState = 'up';
+            }
+        };
+        Button.prototype.onPointerOut = function (evt) {
+            this.onCancel(evt);
+        };
+        Button.prototype.onPointerUp = function (evt) {
+            this.onCancel(evt);
+        };
+        Button.prototype.onPointerOutside = function (evt) {
+            this.onCancel(evt);
+        };
+        Button.prototype.onPointerTap = function (evt) {
+            this.currentState = 'up';
+        };
+        Button.prototype.onCancel = function (evt) {
+            if (this._downPoint == null) {
+                evt.stopPropagation();
+            }
+            this._downPoint = null;
+        };
+        return Button;
+    }(eui.Component));
+    eui.Button = Button;
+})(eui || (eui = {}));
+var eui;
+(function (eui) {
     var Image = (function (_super) {
         __extends(Image, _super);
         function Image() {
-            var _this = _super.call(this) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this._range = new PIXI.Rectangle();
             return _this;
         }
@@ -477,6 +644,9 @@ var eui;
                             _this.updateView();
                         }, this);
                     }
+                }
+                else {
+                    eui.log('没有找到贴图：' + value, eui.LOG_LEVEL_WARNING);
                 }
             },
             enumerable: true,
@@ -618,8 +788,10 @@ var eui;
             Component: function (config) { return new eui.Component(); },
             Group: function (config) { return new eui.Group(); },
             Image: function (config) { return new eui.Image(); },
+            Button: function (config) { return new eui.Button(); },
             layout: function (config, parent) {
                 if (!(parent instanceof eui.Group)) {
+                    eui.log('布局laytou，父级不是Group实例', eui.LOG_LEVEL_WARNING);
                     return;
                 }
                 if (config.children != null) {
@@ -811,6 +983,7 @@ var eui;
         var skinAttributeOrder = ['hostComponent', 'states', 'width', 'height', 'children', 'currentState'];
         function parseSkinConfig(target, skinName) {
             if (eui.skinDict[skinName] == null) {
+                eui.log('解析皮肤配置没找到皮肤：' + skinName, eui.LOG_LEVEL_WARNING);
                 return;
             }
             var skinConfig = eui.skinDict[skinName];
@@ -845,6 +1018,7 @@ var eui;
                     config[state][subs[0]] = value;
                 }
                 else {
+                    eui.log('配置组件状态属性出现超过一个"."作为分隔符的非法配置', eui.LOG_LEVEL_WARNING);
                 }
             }
             for (var cfgKey in config) {
@@ -946,6 +1120,27 @@ var eui;
     }
     eui.parseXML = parseXML;
 })(eui || (eui = {}));
+var eui;
+(function (eui) {
+    eui.LOG_LEVEL_PRINT = 0;
+    eui.LOG_LEVEL_WARNING = 1;
+    eui.LOG_LEVEL_ERROR = 2;
+    function log(content, level) {
+        if (level === void 0) { level = eui.LOG_LEVEL_PRINT; }
+        switch (level) {
+            case 0:
+                console.log('[log]' + content);
+                break;
+            case 1:
+                console.warn('[warning]' + content);
+                break;
+            case 2:
+                console.error('[error]' + content);
+                break;
+        }
+    }
+    eui.log = log;
+})(eui || (eui = {}));
 var stats = new Stats();
 stats.showPanel(0);
 document.body.appendChild(stats.dom);
@@ -966,8 +1161,9 @@ function render() {
 render();
 PIXI.loader.add(['assets/ccc/loding_icon.png', 'assets/scene_bg3.png', 'assets/bbb/fst_1_1.png']);
 PIXI.loader.load(function (loader, res) {
-    var cfg = "<e:Skin class=\"Test\" width=\"500\" height=\"250\" xmlns:e=\"http://ns.egret.com/eui\" xmlns:w=\"http://ns.egret.com/wing\" xmlns:ns1=\"*\" >\n        <e:Image anchorOffsetX=\"0\" anchorOffsetY=\"0\" source=\"assets/scene_bg3.png\" rotation=\"0\" skewX=\"0\" skewY=\"0\" scaleX=\"1\" scaleY=\"1\" width=\"100%\" height=\"100%\" horizontalCenter=\"0\" verticalCenter=\"0\"/>\n        <e:Image source=\"assets/ccc/loding_icon.png\" minWidth=\"40\" minHeight=\"40\" scale9Grid=\"37,37,226,226\" left=\"20\" right=\"20\" top=\"20\" bottom=\"20\"/>\n        <e:Button label=\"Button\" icon=\"assets/bbb/fst_1_1.png\" skinName=\"ButtonSkin\" x=\"300\" y=\"50\"/>\n    </e:Skin>";
+    var cfg = "<e:Skin class=\"Test\" width=\"500\" height=\"250\" xmlns:e=\"http://ns.egret.com/eui\" xmlns:w=\"http://ns.egret.com/wing\" xmlns:ns1=\"*\" >\n        <e:Image id=\"test\" anchorOffsetX=\"0\" anchorOffsetY=\"0\" source=\"assets/scene_bg3.png\" rotation=\"0\" skewX=\"0\" skewY=\"0\" scaleX=\"1\" scaleY=\"1\" width=\"100%\" height=\"100%\" horizontalCenter=\"0\" verticalCenter=\"0\"/>\n        <e:Image id=\"test2\" source=\"assets/ccc/loding_icon.png\" minWidth=\"40\" minHeight=\"40\" scale9Grid=\"37,37,226,226\" left=\"20\" right=\"20\" top=\"20\" bottom=\"20\"/>\n        <e:Button id=\"test3\" label=\"Button\" icon=\"assets/bbb/fst_1_1.png\" skinName=\"ButtonSkin\" x=\"300\" y=\"50\"/>\n    </e:Skin>";
     eui.skinDict['Test'] = cfg;
+    eui.skinDict['ButtonSkin'] = "<e:Skin class=\"ButtonSkin\" currentState=\"up\" xmlns:e=\"http://ns.egret.com/eui\" xmlns:w=\"http://ns.egret.com/wing\" states=\"up,down,disable\" >\n        <e:Image id=\"iconDisplay\" anchorOffsetX=\"0\" anchorOffsetY=\"0\" source=\"assets/bbb/fst_1_1.png\" source.disable=\"default_boy_mc_png\" scaleX.disable=\"1\" scaleY.disable=\"1\" x.disable=\"62.52\" y.disable=\"39.39\" x.up=\"0\" y.up=\"0\" left.down=\"20\" right.down=\"20\" top.down=\"20\" bottom.down=\"20\" width.down=\"210\" height.down=\"210\" name.up=\"1\" name.down=\"2\"/>\n        <e:Label id=\"test4\" text=\"disable\" includeIn=\"disable\" x=\"154\" y=\"9.39\"/>\n        <e:Label id=\"test5\" text=\"up\" includeIn=\"up,down\" x.disable=\"16\" y.disable=\"24\" text.down=\"down\" y.up=\"20\" left.down=\"0\" top.down=\"165\"/>\n    </e:Skin>";
     var component = new eui.Component();
     eui.ConfigParser.parseSkinConfig(component, 'Test');
     stage.addChild(component);

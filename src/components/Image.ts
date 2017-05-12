@@ -1,13 +1,7 @@
 namespace eui
 {
-
     export class Image extends CompatibilityContainer
     {
-
-        constructor()
-        {
-            super();
-        }
 
         // 九宫格配置
         protected _range: PIXI.Rectangle = new PIXI.Rectangle();
@@ -147,6 +141,10 @@ namespace eui
                         this.updateView();
                     }, this);
                 }
+            }
+            else
+            {
+                log('没有找到贴图：' + value, LOG_LEVEL_WARNING);
             }
         }
         public get source(): string | PIXI.Texture

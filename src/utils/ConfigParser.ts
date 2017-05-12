@@ -1,18 +1,19 @@
 namespace eui.ConfigParser
 {
-
     // 根据配置构建显示对象
     const createComponentDict: any = {
         Component: (config: any) => new Component(),
         Group: (config: any) => new Group(),
         Image: (config: any) => new Image(),
+        Button: (config: any) => new Button(),
 
         // 布局要做特殊处理
         layout: (config: any, parent: Group) =>
         {
             if (!(parent instanceof Group))
             {
-                // TODO throw error?
+                log('布局laytou，父级不是Group实例', LOG_LEVEL_WARNING);
+
                 return;
             }
             if (config.children != null)
@@ -20,6 +21,8 @@ namespace eui.ConfigParser
                 let type: string = config.type;
                 // TODO 配置里带了 e: 以后可能去掉
                 type = type.substr(2, type.length - 1);
+
+                // TODO
             }
         },
     };
@@ -293,7 +296,8 @@ namespace eui.ConfigParser
     {
         if (skinDict[skinName] == null)
         {
-            // TODO throw error?
+            log('解析皮肤配置没找到皮肤：' + skinName, LOG_LEVEL_WARNING);
+
             return;
         }
         let skinConfig: any = skinDict[skinName];
@@ -342,6 +346,7 @@ namespace eui.ConfigParser
             else
             {
                 // TODO throw error?
+                log('配置组件状态属性出现超过一个"."作为分隔符的非法配置', LOG_LEVEL_WARNING);
             }
         }
 
