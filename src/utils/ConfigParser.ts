@@ -23,6 +23,12 @@ namespace eui.ConfigParser
                 type = type.substr(2, type.length - 1);
 
                 // TODO
+                switch (type)
+                {
+                    case 'BasicLayout':
+                    parent.layout = new BasicLayout();
+                    break;
+                }
             }
         },
     };
@@ -215,7 +221,7 @@ namespace eui.ConfigParser
         },
         source: (target: Image, value: string) =>
         {
-            target.source = PIXI.utils.TextureCache[value];
+            target.source = getTexture(value);
         },
     };
 
@@ -290,7 +296,7 @@ namespace eui.ConfigParser
 
 
     // 解析皮肤时属性顺序
-    const skinAttributeOrder: string[] = ['hostComponent', 'states', 'width', 'height', 'children', 'currentState'];
+    const skinAttributeOrder: string[] = ['states', 'width', 'height', 'children', 'currentState'];
     // 解析皮肤配置
     export function parseSkinConfig(target: Component, skinName: string): void
     {

@@ -8,6 +8,19 @@ namespace eui
 
 
 
+    /**
+     * 获取贴图
+     * @export
+     * @param {string} value 
+     * @returns {PIXI.Texture} 
+     */
+    export function getTexture(value: string): PIXI.Texture
+    {
+        return PIXI.utils.TextureCache[value];
+    }
+
+
+
 
     const TYPE_TEXT: string = '#text';
 

@@ -42,9 +42,19 @@ PIXI.loader.load((loader: PIXI.loaders.Loader, res: {[key: string]: PIXI.loaders
         <e:Label id="test4" text="disable" includeIn="disable" x="154" y="9.39"/>
         <e:Label id="test5" text="up" includeIn="up,down" x.disable="16" y.disable="24" text.down="down" y.up="20" left.down="0" top.down="165"/>
     </e:Skin>`;
+    eui.skinDict['Scene'] = `<?xml version="1.0" encoding="utf-8"?>
+    <e:Skin class="Scene" width="1024" height="768" xmlns:e="http://ns.egret.com/eui" hostComponent="fuck"    >
+        <e:Group height="200" y="22" left="0" right="0">
+            <e:layout>
+                <e:BasicLayout/>
+            </e:layout>
+            <e:Image width="20%" height="100%" x="203" y="0" source="assets/bbb/fst_1_1.png" anchorOffsetX="0" anchorOffsetY="0"/>
+            <e:Image source="assets/bbb/fst_1_1.png" left="300" right="300" top="0" bottom="0"/>
+        </e:Group>
+    </e:Skin>`;
 
     let component: eui.Component = new eui.Component();
-    eui.ConfigParser.parseSkinConfig(component, 'Test');
+    eui.ConfigParser.parseSkinConfig(component, 'Scene');
     stage.addChild(component);
 });
 
