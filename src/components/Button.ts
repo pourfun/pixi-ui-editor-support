@@ -45,7 +45,7 @@ namespace eui
         protected onPointerDown(evt: PIXI.interaction.InteractionEvent): void
         {
             this._downPoint = evt.data.global.clone();
-            this.currentState = 'down';
+            this.childrenState = 'down';
         }
         protected onPointerMove(evt: PIXI.interaction.InteractionEvent): void
         {
@@ -57,7 +57,7 @@ namespace eui
             if (Math.abs(pt.x - this._downPoint.x) > 10 || Math.abs(pt.y - this._downPoint.y) > 10)
             {
                 this._downPoint = null;
-                this.currentState = 'up';
+                this.childrenState = 'up';
             }
         }
         protected onPointerOut(evt: PIXI.interaction.InteractionEvent): void
@@ -74,7 +74,7 @@ namespace eui
         }
         protected onPointerTap(evt: PIXI.interaction.InteractionEvent): void
         {
-            this.currentState = 'up';
+            this.childrenState = 'up';
         }
 
         private onCancel(evt: PIXI.interaction.InteractionEvent): void

@@ -22,13 +22,7 @@ namespace eui.ConfigParser
                 // TODO 配置里带了 e: 以后可能去掉
                 type = type.substr(2, type.length - 1);
 
-                // TODO
-                switch (type)
-                {
-                    case 'BasicLayout':
-                    parent.layout = new BasicLayout();
-                    break;
-                }
+                parent.layout = type;
             }
         },
     };
@@ -63,7 +57,6 @@ namespace eui.ConfigParser
             else
             {
                 target.explicitWidth = +value;
-                target.width = target.explicitWidth;
             }
         },
         height: (target: CompatibilityContainer, value: string) =>
@@ -75,7 +68,6 @@ namespace eui.ConfigParser
             else
             {
                 target.explicitHeight = +value;
-                target.height = target.explicitHeight;
             }
         },
         alpha: (target: CompatibilityContainer, value: string) =>
@@ -201,6 +193,7 @@ namespace eui.ConfigParser
                     }
                 }
             }
+            Layout.BasicLayout(target, target.explicitWidth, target.explicitHeight);
         },
 
 
@@ -222,6 +215,12 @@ namespace eui.ConfigParser
         source: (target: Image, value: string) =>
         {
             target.source = getTexture(value);
+        },
+
+        // Button
+        icon: (target: Button, value: string) =>
+        {
+            target.icon = value;
         },
     };
 

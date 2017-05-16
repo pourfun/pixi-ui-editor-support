@@ -121,7 +121,7 @@ namespace eui
             }
             else if (typeof value === 'string')
             {
-                let texture: PIXI.Texture = target.source = getTexture(value);
+                let texture: PIXI.Texture = getTexture(value);
                 this._source = value;
                 if (texture != null)
                 {

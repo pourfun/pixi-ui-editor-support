@@ -27,7 +27,7 @@ namespace eui
         protected _explicitHeight: number;
 
         // 是否应用父级的布局
-        protected _includeInLayout: boolean;
+        protected _includeInLayout: boolean = true;
         // 状态
         protected _states: string[];
         // 当前状态
@@ -201,6 +201,7 @@ namespace eui
         public set explicitWidth(value: number)
         {
             this._explicitWidth = +value;
+            Layout.BasicLayout(this, this._explicitWidth, this._explicitHeight);
         }
         public get explicitWidth(): number
         {
@@ -211,6 +212,7 @@ namespace eui
         public set explicitHeight(value: number)
         {
             this._explicitHeight = +value;
+            Layout.BasicLayout(this, this._explicitWidth, this._explicitHeight);
         }
         public get explicitHeight(): number
         {
@@ -240,16 +242,24 @@ namespace eui
                 return;
             }
             this._currentState = value;
-            this.updateConfigDisplay(config);
+            ConfigParser.setComponentAttributes(this, config);
+            this.childrenState = value;
         }
         public get currentState(): string
         {
             return this._currentState;
         }
-        protected updateConfigDisplay(config: any): void
+
+
+        public set childrenState(value: string)
         {
-            ConfigParser.setComponentAttributes(this, config);
+            let children: PIXI.DisplayObject[] = this.children;
+            for (let i: number = 0; i < children.length; i++)
+            {
+                (children[i] as CompatibilityContainer).currentState = value;
+            }
         }
+
 
 
         public set config(value: any)

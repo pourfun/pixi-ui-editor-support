@@ -20,7 +20,7 @@ namespace eui
         // 是否允许滚动
         protected _scrollEnabled: boolean;
 
-        protected _layout: BasicLayout;
+        protected _layout: string;
 
 
         public set contentWidth(value: number)
@@ -73,26 +73,12 @@ namespace eui
         }
 
 
-        public get layout(): BasicLayout {
+        public get layout(): string {
             return this._layout;
         }
-        public set layout(value: BasicLayout) {
+        public set layout(value: string) {
             this._layout = value;
-            this.setLayout(value);
-        }
-
-        protected setLayout(value: BasicLayout): void
-        {
-            value.updateDisplayList(this, this.explicitWidth, this.explicitHeight);
-        }
-
-        protected onAdded(parent: PIXI.Container): void
-        {
-            if (this._layout == null)
-            {
-                this._layout = new BasicLayout();
-                this.setLayout(this._layout);
-            }
+            // TODO
         }
     }
 
