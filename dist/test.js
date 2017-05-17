@@ -31,6 +31,7 @@ var eui;
         __extends(CompatibilityContainer, _super);
         function CompatibilityContainer() {
             var _this = _super.call(this) || this;
+            _this._includeInLayout = true;
             _this.addListeners();
             return _this;
         }
@@ -190,6 +191,7 @@ var eui;
             },
             set: function (value) {
                 this._explicitWidth = +value;
+                eui.Layout.BasicLayout(this, this._explicitWidth, this._explicitHeight);
             },
             enumerable: true,
             configurable: true
@@ -200,6 +202,7 @@ var eui;
             },
             set: function (value) {
                 this._explicitHeight = +value;
+                eui.Layout.BasicLayout(this, this._explicitWidth, this._explicitHeight);
             },
             enumerable: true,
             configurable: true
@@ -227,14 +230,22 @@ var eui;
                     return;
                 }
                 this._currentState = value;
-                this.updateConfigDisplay(config);
+                eui.ConfigParser.setComponentAttributes(this, config);
+                this.childrenState = value;
             },
             enumerable: true,
             configurable: true
         });
-        CompatibilityContainer.prototype.updateConfigDisplay = function (config) {
-            eui.ConfigParser.setComponentAttributes(this, config);
-        };
+        Object.defineProperty(CompatibilityContainer.prototype, "childrenState", {
+            set: function (value) {
+                var children = this.children;
+                for (var i = 0; i < children.length; i++) {
+                    children[i].currentState = value;
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(CompatibilityContainer.prototype, "config", {
             set: function (value) {
                 this._config = value;
@@ -449,6 +460,16 @@ var eui;
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(Group.prototype, "layout", {
+            get: function () {
+                return this._layout;
+            },
+            set: function (value) {
+                this._layout = value;
+            },
+            enumerable: true,
+            configurable: true
+        });
         return Group;
     }(eui.CompatibilityContainer));
     eui.Group = Group;
@@ -494,7 +515,7 @@ var eui;
         });
         Button.prototype.onPointerDown = function (evt) {
             this._downPoint = evt.data.global.clone();
-            this.currentState = 'down';
+            this.childrenState = 'down';
         };
         Button.prototype.onPointerMove = function (evt) {
             if (this._downPoint == null) {
@@ -503,7 +524,7 @@ var eui;
             var pt = evt.data.global;
             if (Math.abs(pt.x - this._downPoint.x) > 10 || Math.abs(pt.y - this._downPoint.y) > 10) {
                 this._downPoint = null;
-                this.currentState = 'up';
+                this.childrenState = 'up';
             }
         };
         Button.prototype.onPointerOut = function (evt) {
@@ -516,7 +537,7 @@ var eui;
             this.onCancel(evt);
         };
         Button.prototype.onPointerTap = function (evt) {
-            this.currentState = 'up';
+            this.childrenState = 'up';
         };
         Button.prototype.onCancel = function (evt) {
             if (this._downPoint == null) {
@@ -628,7 +649,7 @@ var eui;
                     this.updateView();
                 }
                 else if (typeof value === 'string') {
-                    var texture = PIXI.utils.TextureCache[value];
+                    var texture = eui.getTexture(value);
                     this._source = value;
                     if (texture != null) {
                         this._texture = texture;
@@ -782,6 +803,28 @@ var eui;
 })(eui || (eui = {}));
 var eui;
 (function (eui) {
+    var BasicLayout = (function (_super) {
+        __extends(BasicLayout, _super);
+        function BasicLayout() {
+            return _super.call(this) || this;
+        }
+        return BasicLayout;
+    }(PIXI.utils.EventEmitter));
+    eui.BasicLayout = BasicLayout;
+})(eui || (eui = {}));
+var eui;
+(function (eui) {
+    var VerticalLayout = (function (_super) {
+        __extends(VerticalLayout, _super);
+        function VerticalLayout() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        return VerticalLayout;
+    }(PIXI.utils.EventEmitter));
+    eui.VerticalLayout = VerticalLayout;
+})(eui || (eui = {}));
+var eui;
+(function (eui) {
     var ConfigParser;
     (function (ConfigParser) {
         var createComponentDict = {
@@ -797,6 +840,7 @@ var eui;
                 if (config.children != null) {
                     var type = config.type;
                     type = type.substr(2, type.length - 1);
+                    parent.layout = type;
                 }
             },
         };
@@ -819,7 +863,6 @@ var eui;
                 }
                 else {
                     target.explicitWidth = +value;
-                    target.width = target.explicitWidth;
                 }
             },
             height: function (target, value) {
@@ -828,7 +871,6 @@ var eui;
                 }
                 else {
                     target.explicitHeight = +value;
-                    target.height = target.explicitHeight;
                 }
             },
             alpha: function (target, value) {
@@ -919,6 +961,7 @@ var eui;
                         }
                     }
                 }
+                eui.Layout.BasicLayout(target, target.explicitWidth, target.explicitHeight);
             },
             enable: function (target, value) {
                 target.enable = getBoolean(value);
@@ -930,7 +973,10 @@ var eui;
                 target.scale9Grid = value;
             },
             source: function (target, value) {
-                target.source = PIXI.utils.TextureCache[value];
+                target.source = eui.getTexture(value);
+            },
+            icon: function (target, value) {
+                target.icon = value;
             },
         };
         var invalidAttributes = {};
@@ -980,7 +1026,7 @@ var eui;
             }
         }
         ConfigParser.setComponentAttributes = setComponentAttributes;
-        var skinAttributeOrder = ['hostComponent', 'states', 'width', 'height', 'children', 'currentState'];
+        var skinAttributeOrder = ['states', 'width', 'height', 'children', 'currentState'];
         function parseSkinConfig(target, skinName) {
             if (eui.skinDict[skinName] == null) {
                 eui.log('解析皮肤配置没找到皮肤：' + skinName, eui.LOG_LEVEL_WARNING);
@@ -1053,6 +1099,10 @@ var eui;
 var eui;
 (function (eui) {
     eui.skinDict = {};
+    function getTexture(value) {
+        return PIXI.utils.TextureCache[value];
+    }
+    eui.getTexture = getTexture;
     var TYPE_TEXT = '#text';
     function parseXML(data) {
         var xml;
@@ -1141,6 +1191,96 @@ var eui;
     }
     eui.log = log;
 })(eui || (eui = {}));
+var eui;
+(function (eui) {
+    var Layout;
+    (function (Layout) {
+        function BasicLayout(target, unscaledWidth, unscaledHeight) {
+            if (!target) {
+                return;
+            }
+            var count = target.children.length;
+            var maxX = 0;
+            var maxY = 0;
+            for (var i = 0; i < count; i++) {
+                var layoutElement = target.getChildAt(i);
+                if (!layoutElement.includeInLayout) {
+                    continue;
+                }
+                var bounds = layoutElement.getBounds();
+                var hCenter = formatRelative(layoutElement.horizontalCenter, unscaledWidth * 0.5);
+                var vCenter = formatRelative(layoutElement.verticalCenter, unscaledHeight * 0.5);
+                var left = formatRelative(layoutElement.left, unscaledWidth);
+                var right = formatRelative(layoutElement.right, unscaledWidth);
+                var top_1 = formatRelative(layoutElement.top, unscaledHeight);
+                var bottom = formatRelative(layoutElement.bottom, unscaledHeight);
+                var percentWidth = layoutElement.percentWidth;
+                var percentHeight = layoutElement.percentHeight;
+                var childWidth = NaN;
+                var childHeight = NaN;
+                if (!isNaN(left) && !isNaN(right)) {
+                    childWidth = unscaledWidth - right - left;
+                }
+                else if (!isNaN(percentWidth)) {
+                    childWidth = Math.round(unscaledWidth * Math.min(percentWidth * 0.01, 1));
+                }
+                if (!isNaN(top_1) && !isNaN(bottom)) {
+                    childHeight = unscaledHeight - bottom - top_1;
+                }
+                else if (!isNaN(percentHeight)) {
+                    childHeight = Math.round(unscaledHeight * Math.min(percentHeight * 0.01, 1));
+                }
+                layoutElement.explicitWidth = childWidth;
+                layoutElement.explicitHeight = childHeight;
+                var elementWidth = bounds.width;
+                var elementHeight = bounds.height;
+                var childX = NaN;
+                var childY = NaN;
+                if (!isNaN(hCenter)) {
+                    childX = Math.round((unscaledWidth - elementWidth) / 2 + hCenter);
+                }
+                else if (!isNaN(left)) {
+                    childX = left;
+                }
+                else if (!isNaN(right)) {
+                    childX = unscaledWidth - elementWidth - right;
+                }
+                else {
+                    childX = bounds.x;
+                }
+                if (!isNaN(vCenter)) {
+                    childY = Math.round((unscaledHeight - elementHeight) / 2 + vCenter);
+                }
+                else if (!isNaN(top_1)) {
+                    childY = top_1;
+                }
+                else if (!isNaN(bottom)) {
+                    childY = unscaledHeight - elementHeight - bottom;
+                }
+                else {
+                    childY = bounds.y;
+                }
+                layoutElement.x = childX;
+                layoutElement.y = childY;
+                maxX = Math.max(maxX, childX + elementWidth);
+                maxY = Math.max(maxY, childY + elementHeight);
+            }
+        }
+        Layout.BasicLayout = BasicLayout;
+        function formatRelative(value, total) {
+            if (!value || typeof value === 'number') {
+                return value;
+            }
+            var str = value;
+            var index = str.indexOf('%');
+            if (index === -1) {
+                return +str;
+            }
+            var percent = +str.substring(0, index);
+            return percent * 0.01 * total;
+        }
+    })(Layout = eui.Layout || (eui.Layout = {}));
+})(eui || (eui = {}));
 var stats = new Stats();
 stats.showPanel(0);
 document.body.appendChild(stats.dom);
@@ -1149,7 +1289,7 @@ var stageWidth = 1024;
 var stageHeight = 768;
 var frameID = 0;
 var canvas = document.getElementById('canvas');
-var app = PIXI.autoDetectRenderer(stageWidth, stageHeight, { backgroundColor: 0xf0f0f0 });
+var app = new PIXI.CanvasRenderer(stageWidth, stageHeight, { backgroundColor: 0xf0f0f0 });
 canvas.appendChild(app.view);
 var stage = new PIXI.Container();
 function render() {
@@ -1159,13 +1299,85 @@ function render() {
     stats.end();
 }
 render();
-PIXI.loader.add(['assets/ccc/loding_icon.png', 'assets/scene_bg3.png', 'assets/bbb/fst_1_1.png']);
+PIXI.loader.add(['assets/ccc/loding_icon.png', 'assets/scene_bg3.png', 'assets/bbb/fst_1_1.png', 'assets/bbb/fst_1_2.png']);
 PIXI.loader.load(function (loader, res) {
-    var cfg = "<e:Skin class=\"Test\" width=\"500\" height=\"250\" xmlns:e=\"http://ns.egret.com/eui\" xmlns:w=\"http://ns.egret.com/wing\" xmlns:ns1=\"*\" >\n        <e:Image id=\"test\" anchorOffsetX=\"0\" anchorOffsetY=\"0\" source=\"assets/scene_bg3.png\" rotation=\"0\" skewX=\"0\" skewY=\"0\" scaleX=\"1\" scaleY=\"1\" width=\"100%\" height=\"100%\" horizontalCenter=\"0\" verticalCenter=\"0\"/>\n        <e:Image id=\"test2\" source=\"assets/ccc/loding_icon.png\" minWidth=\"40\" minHeight=\"40\" scale9Grid=\"37,37,226,226\" left=\"20\" right=\"20\" top=\"20\" bottom=\"20\"/>\n        <e:Button id=\"test3\" label=\"Button\" icon=\"assets/bbb/fst_1_1.png\" skinName=\"ButtonSkin\" x=\"300\" y=\"50\"/>\n    </e:Skin>";
-    eui.skinDict['Test'] = cfg;
-    eui.skinDict['ButtonSkin'] = "<e:Skin class=\"ButtonSkin\" currentState=\"up\" xmlns:e=\"http://ns.egret.com/eui\" xmlns:w=\"http://ns.egret.com/wing\" states=\"up,down,disable\" >\n        <e:Image id=\"iconDisplay\" anchorOffsetX=\"0\" anchorOffsetY=\"0\" source=\"assets/bbb/fst_1_1.png\" source.disable=\"default_boy_mc_png\" scaleX.disable=\"1\" scaleY.disable=\"1\" x.disable=\"62.52\" y.disable=\"39.39\" x.up=\"0\" y.up=\"0\" left.down=\"20\" right.down=\"20\" top.down=\"20\" bottom.down=\"20\" width.down=\"210\" height.down=\"210\" name.up=\"1\" name.down=\"2\"/>\n        <e:Label id=\"test4\" text=\"disable\" includeIn=\"disable\" x=\"154\" y=\"9.39\"/>\n        <e:Label id=\"test5\" text=\"up\" includeIn=\"up,down\" x.disable=\"16\" y.disable=\"24\" text.down=\"down\" y.up=\"20\" left.down=\"0\" top.down=\"165\"/>\n    </e:Skin>";
+    eui.skinDict['Test'] = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n    <e:Skin class=\"Test\" width=\"500\" height=\"250\" xmlns:e=\"http://ns.egret.com/eui\" xmlns:w=\"http://ns.egret.com/wing\" xmlns:ns1=\"*\" >\n        <e:Image anchorOffsetX=\"0\" anchorOffsetY=\"0\" rotation=\"0\" skewX=\"0\" skewY=\"0\" scaleX=\"1\" scaleY=\"1\" width=\"300%\" height=\"300%\" horizontalCenter=\"0\" verticalCenter=\"0\" source=\"assets/scene_bg3.png\"/>\n        <e:Image minWidth=\"40\" minHeight=\"40\" scale9Grid=\"37,37,226,226\" left=\"20\" right=\"20\" top=\"20\" bottom=\"20\" source=\"assets/ccc/loding_icon.png\"/>\n        <e:Button label=\"Button\" skinName=\"ButtonSkin\" right=\"0\" bottom=\"0\" icon=\"assets/bbb/fst_1_2.png\"/>\n    </e:Skin>";
+    eui.skinDict['ButtonSkin'] = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<e:Skin class=\"ButtonSkin\" currentState=\"up\" xmlns:e=\"http://ns.egret.com/eui\" xmlns:w=\"http://ns.egret.com/wing\" states=\"up,down,disable\" >\n\t<e:Image id=\"iconDisplay\" anchorOffsetX=\"0\" anchorOffsetY=\"0\" scaleX.disable=\"1\" scaleY.disable=\"1\" x.disable=\"0\" y.disable=\"0\" left.down=\"20\" right.down=\"20\" top.down=\"20\" bottom.down=\"20\" width.down=\"230\" height.down=\"230\" name.up=\"1\" name.down=\"2\" source=\"assets/bbb/fst_1_2.png\" source.disable=\"assets/bbb/fst_1_3.png\" left.up=\"0\" right.up=\"0\" top.up=\"0\" bottom.up=\"0\" source.down=\"assets/bbb/fst_1_1.png\"/>\n\t<e:Label text=\"disable\" includeIn=\"disable\" x=\"14\" y=\"89.39\"/>\n\t<e:Label text=\"up\" includeIn=\"up,down\" x.disable=\"16\" y.disable=\"24\" text.down=\"down\" y.up=\"31\" left.down=\"0\" top.down=\"165\" x.up=\"28\"/>\n</e:Skin>";
+    eui.skinDict['Scene'] = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n    <e:Skin class=\"Scene\" width=\"3024\" height=\"768\" xmlns:e=\"http://ns.egret.com/eui\" hostComponent=\"fuck\"    >\n        <e:Component skinName=\"Test\" anchorOffsetX=\"0\" anchorOffsetY=\"0\" width=\"300%\" height=\"80%\" x=\"0\" verticalCenter=\"0\"/>\n        <e:Group height=\"200\" y=\"22\" left=\"0\" right=\"0\">\n            <e:layout>\n                <e:BasicLayout/>\n            </e:layout>\n            <e:Image width=\"20%\" height=\"300%\" x=\"203\" y=\"0\" source=\"assets/bbb/fst_1_2.png\" anchorOffsetX=\"0\" anchorOffsetY=\"0\"/>\n            <e:Image source=\"assets/bbb/fst_1_2.png\" left=\"300\" right=\"300\" top=\"0\" bottom=\"0\"/>\n        </e:Group>\n    </e:Skin>";
     var component = new eui.Component();
-    eui.ConfigParser.parseSkinConfig(component, 'Test');
-    stage.addChild(component);
+    eui.ConfigParser.parseSkinConfig(component, 'Scene');
+    var a = new PIXI.Sprite(PIXI.utils.TextureCache['assets/bbb/fst_1_2.png']);
+    stage.addChild(a);
+    var b = new PIXI.Sprite(PIXI.utils.TextureCache['assets/bbb/fst_1_1.png']);
+    stage.addChild(b);
+    b.x = 200;
+    var canvas = document.createElement('canvas');
+    var ctx = canvas.getContext('2d');
+    var texture = PIXI.utils.TextureCache['assets/scene_bg3.png'];
+    canvas.width = 1024;
+    canvas.height = 768;
+    ctx.drawImage(texture.baseTexture.source, 0, 0);
+    var tt = new PIXI.Texture(new PIXI.BaseTexture(canvas));
+    var sp = new PIXI.Sprite(tt);
+    stage.addChild(sp);
+    sp.interactive = true;
+    var start;
+    sp.on('pointerdown', function (evt) {
+        start = evt.data.global.clone();
+        clear(start.x, start.y, start.x, start.y);
+    }, sp);
+    sp.on('pointermove', function (evt) {
+        if (start == null) {
+            return;
+        }
+        var end = evt.data.global;
+        clear(start.x, start.y, end.x, end.y);
+        start = end.clone();
+    }, sp);
+    sp.on('pointerup', function (evt) {
+        start = null;
+    }, sp);
+    sp.on('pointerout', function (evt) {
+        start = null;
+    }, sp);
+    sp.on('pointerupoutside', function (evt) {
+        start = null;
+    }, sp);
+    function clear(x1, y1, x2, y2) {
+        var r = 30;
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(x1, y1, r, 0, 2 * Math.PI);
+        ctx.clip();
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.restore();
+        var rad = Math.atan((y2 - y1) / (x2 - x1));
+        var a = r * Math.sin(rad);
+        var b = r * Math.cos(rad);
+        var x3 = x1 + a;
+        var y3 = y1 - b;
+        var x4 = x1 - a;
+        var y4 = y1 + b;
+        var x5 = x2 + a;
+        var y5 = y2 - b;
+        var x6 = x2 - a;
+        var y6 = y2 + b;
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(x3, y3);
+        ctx.lineTo(x5, y5);
+        ctx.lineTo(x6, y6);
+        ctx.lineTo(x4, y4);
+        ctx.closePath();
+        ctx.clip();
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.restore();
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(x2, y2, r, 0, 2 * Math.PI);
+        ctx.clip();
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.restore();
+    }
 });
 //# sourceMappingURL=test.js.map
